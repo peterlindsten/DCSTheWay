@@ -60,6 +60,10 @@ public class WaypointManager {
                     String dataToSend = AH64.getCPGCommands(ah64Coords).toString();
                     PortSender.send(dataToSend);
                 }
+            } else if(model.equals("AJS37")) {
+                List<Point> ajs37Coords = AJS37.getCoords(waypoints);
+                String dataToSend = AJS37.getCommands(ajs37Coords).toString();
+                PortSender.send(dataToSend);
             } else {
                 GUI.error("You are not flying a supported module.");
             }
