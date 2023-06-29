@@ -2,6 +2,8 @@
 Imports waypoints from DCS F10 map into the plane navigation system, like a Data Transfer Cartridge.
 Special thanks to kukiric for helping out with the lua side of things!
 
+Fork of Java version - added AJS37 support
+
 ## What does it do?
 You choose points on the F10 map, press a button, and those points will be entered as steerpoints into your plane.  
 
@@ -14,6 +16,7 @@ Supported modules:
 * AV8BNA Harrier
 * Ka-50 Blackshark
 * AH-64D Apache 
+* AJS37
  
 Multiplayer is supported as long as the server has ownship/player exports turned on.
 
@@ -27,6 +30,8 @@ Multiplayer is supported as long as the server has ownship/player exports turned
    If there is no `Export.lua` file already existing there, create it yourself, and it should include only the line above.
 
 4. Launch `TheWay.exe` and go fly!
+
+*Note: The newer web-based TheWay does NOT use a compatible lua file. You must use the right version*
 
 If you are updating from an older version, simply download the newest release, extract your new `The Way` folder ontop of your old one, replacing your existing files with the new ones. Also don't forget to copy your new `TheWay.lua` file into Saved Games, and override your old one there.
 

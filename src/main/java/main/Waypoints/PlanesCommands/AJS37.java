@@ -1,0 +1,93 @@
+package main.Waypoints.PlanesCommands;
+
+import main.Utils.CoordinateUtils;
+import main.Utils.UnitConvertorUtils;
+import main.models.DMSCoordinate;
+import main.models.Point;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+public class AJS37 {
+    public static JSONArray getCommands(List<Point> coords, int offset) {
+        /*
+        The AJS37 has inherent limitations in its coordinate entry
+        Only 6 digits are allowed for either Lat/Long, and there is no provision for hemispheres
+        The game module "guesses" which hemisphere is meant as well as if there should be a 1 in front of the long value
+        Maps that cross hemispheres (Normandy) has unknown support
+
+        NAVIGATIONPANEL 23 - Dataselector, in/out
+        Actions
+        Dataselector: 3009, 0 - 0.7, .5 = REF/LOLA, .6 = AKT/POS
+        In/out: 3008, 1 = In, 0 = Out
+
+
+        NAVIGATION 12 - Data input
+        Actions
+        Data input, 0-9, 3020 - 3029
+        Nav selector, B1-B9, 3011 - 3019
+        Nav selector, BX, 3010
+        Nav selector, LS, 3009
+        Nav selector, L MÅL, 3008
+
+
+         */
+        JSONArray commandArray = new JSONArray();
+        // REF/LOLA
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "1", "0.5", "false"));
+        // IN
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "1", "false"));
+        // Start entry
+        for (int i = 0; i < coords.size() && i < (9 - offset); i++) {
+            for (char digit : coords.get(i).getLongitude().toCharArray()) {
+                // Digits
+                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
+            }
+            for (char digit : coords.get(i).getLatitude().toCharArray()) {
+                // Digits
+                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
+            }
+            // B1-B9
+            commandArray.put(deviceCodeDelayActivateDepress("12", "301" + (i + 1 + offset), "1", "1", "true"));
+        }
+        // AKT/POS
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "1", "0.6", "false"));
+        // OUT
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "0", "false"));
+        return commandArray;
+    }
+
+    private static JSONObject deviceCodeDelayActivateDepress(String device, String code, String delay, String activate, String depress) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", delay).put("activate", activate).put("addDepress", depress);
+    }
+
+    public static List<Point> getCoords(List<Point> dcsPoints) {
+        List<Point> ajs37points = new ArrayList<>();
+        for (Point dcsPoint : dcsPoints) {
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+
+            DMSCoordinate dmsLat = CoordinateUtils.decimalToDMS(dcsLat);
+            DMSCoordinate dmsLong = CoordinateUtils.decimalToDMS(dcsLong);
+
+            DecimalFormat latDegDf = new DecimalFormat("00");
+            DecimalFormat latMinDf = new DecimalFormat("00");
+            DecimalFormat latSecDf = new DecimalFormat("00");
+            DecimalFormat longDegDf = new DecimalFormat("000");
+            DecimalFormat longMinDf = new DecimalFormat("00");
+            DecimalFormat longSecDf = new DecimalFormat("00");
+            String ajs37Latitude = latDegDf.format(dmsLat.getDegrees()) + latMinDf.format(dmsLat.getMinutes()) + latSecDf.format(dmsLat.getSeconds());
+            String ajs37Longitude = longDegDf.format(dmsLong.getDegrees()).substring(1) + longMinDf.format(dmsLong.getMinutes()) + longSecDf.format(dmsLong.getSeconds());
+            String ajs37Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
+
+            var ajs37Point = new Point(ajs37Latitude, ajs37Longitude, ajs37Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            ajs37points.add(ajs37Point);
+        }
+        return ajs37points;
+    }
+}
