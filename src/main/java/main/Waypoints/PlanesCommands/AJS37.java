@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AJS37 {
-    public static JSONArray getCommands(List<Point> coords) {
+    public static JSONArray getCommands(List<Point> coords, int offset) {
         /*
         The AJS37 has inherent limitations in its coordinate entry
         Only 6 digits are allowed for either Lat/Long, and there is no provision for hemispheres
@@ -42,7 +42,7 @@ public class AJS37 {
         // IN
         commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "1", "false"));
         // Start entry
-        for (int i = 0; i < coords.size() && i < 9; i++) {
+        for (int i = 0; i < coords.size() && i < (9 - offset); i++) {
             for (char digit : coords.get(i).getLongitude().toCharArray()) {
                 // Digits
                 commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
@@ -52,7 +52,7 @@ public class AJS37 {
                 commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
             }
             // B1-B9
-            commandArray.put(deviceCodeDelayActivateDepress("12", "301" + (i + 1), "1", "1", "true"));
+            commandArray.put(deviceCodeDelayActivateDepress("12", "301" + (i + 1 + offset), "1", "1", "true"));
         }
         // AKT/POS
         commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "1", "0.6", "false"));

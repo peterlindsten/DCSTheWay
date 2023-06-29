@@ -6,8 +6,6 @@ import main.Waypoints.WaypointManager;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 
 public class GUI {
@@ -21,7 +19,7 @@ public class GUI {
     static private JButton clearPointsButton;
 
 
-    public static void show(){
+    public static void show() {
         FlatDarkLaf.setup();
         crosshair = new Crosshair();
         gui = new JPanel(new GridLayout(0, 1, 10, 10));
@@ -41,7 +39,7 @@ public class GUI {
         });
 
         selectPointButton.addActionListener(e -> {
-            if(WaypointManager.saveWaypointSuccessful()){
+            if (WaypointManager.saveWaypointSuccessful()) {
                 refreshWaypointCount();
                 populatedSelectionState();
             } else {
@@ -71,12 +69,12 @@ public class GUI {
         frame.pack();
         frame.setResizable(false);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setLocation(0, dim.height-frame.getHeight());
+        frame.setLocation(0, dim.height - frame.getHeight());
         loadIcon();
         frame.setVisible(true);
     }
 
-    public static void warning(String text){
+    public static void warning(String text) {
         JDialog dialog = new JDialog(frame, "Heads up!", true);
         JButton continueButton = new JButton("Continue");
         continueButton.addActionListener(e -> dialog.dispose());
@@ -84,7 +82,7 @@ public class GUI {
         JOptionPane optionPane = new JOptionPane(text, JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION, null, option, option[0]);
 
         Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX()+frame.getWidth(), (int)framePoint.getY());
+        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
         dialog.setContentPane(optionPane);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setResizable(false);
@@ -93,15 +91,14 @@ public class GUI {
         dialog.setVisible(true);
     }
 
-    public static void error(String text){
+    public static void error(String text) {
         JDialog dialog = new JDialog(frame, "Error", true);
         JButton continueButton = new JButton("OK");
         continueButton.addActionListener(e -> dialog.dispose());
         JButton[] option = {continueButton};
         JOptionPane optionPane = new JOptionPane(text, JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION, null, option, option[0]);
-
         Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX()+frame.getWidth(), (int)framePoint.getY());
+        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
         dialog.setContentPane(optionPane);
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setResizable(false);
@@ -110,13 +107,13 @@ public class GUI {
         dialog.setVisible(true);
     }
 
-    public static String choice(String question, String option1, String option2){
+    public static String choice(String question, String option1, String option2) {
         JDialog dialog = new JDialog(frame, "Choose an option", true);
         Object[] options = {option1, option2};
         JOptionPane optionPane = new JOptionPane(question, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 
         Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX()+frame.getWidth(), (int)framePoint.getY());
+        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
         dialog.setContentPane(optionPane);
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         dialog.setResizable(false);
@@ -137,7 +134,33 @@ public class GUI {
         return (String) optionPane.getValue();
     }
 
-    private static void standbyState(){
+    public static String multiChoice(String question, String[] choices) {
+        JDialog dialog = new JDialog(frame, "Choose an options", true);
+        JOptionPane optionPane = new JOptionPane(question, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, choices, choices[0]);
+
+        Point framePoint = frame.getLocation();
+        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
+        dialog.setContentPane(optionPane);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.setFocusableWindowState(false);
+
+        optionPane.addPropertyChangeListener(
+                e -> {
+                    String prop = e.getPropertyName();
+                    if (dialog.isVisible()
+                            && (e.getSource() == optionPane)
+                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                        dialog.setVisible(false);
+                    }
+                });
+
+        dialog.pack();
+        dialog.setVisible(true);
+        return (String) optionPane.getValue();
+    }
+
+    private static void standbyState() {
         crosshair.hide();
         beginSelectionButton.setEnabled(true);
         clearPointsButton.setEnabled(false);
@@ -145,31 +168,31 @@ public class GUI {
         selectPointButton.setEnabled(false);
     }
 
-    private static void emptySelectionState(){
+    private static void emptySelectionState() {
         crosshair.show();
         beginSelectionButton.setEnabled(false);
         selectPointButton.setEnabled(true);
     }
 
-    private static void populatedSelectionState(){
+    private static void populatedSelectionState() {
         clearPointsButton.setEnabled(true);
         transferToDCSButton.setEnabled(true);
     }
 
-    private static void transferredState(){
+    private static void transferredState() {
         crosshair.hide();
         selectPointButton.setEnabled(false);
         clearPointsButton.setEnabled(true);
         beginSelectionButton.setEnabled(false);
     }
 
-    private static void refreshWaypointCount(){
+    private static void refreshWaypointCount() {
         int count = WaypointManager.getSelectedWaypointsCount();
-        if (count>0){
-            if (count==1){
+        if (count > 0) {
+            if (count == 1) {
                 textArea.setText("1 waypoint selected");
             } else {
-                textArea.setText(count+" waypoints selected");
+                textArea.setText(count + " waypoints selected");
             }
         } else {
             textArea.setText("No waypoints selected");
