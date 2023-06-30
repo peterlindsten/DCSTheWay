@@ -1,0 +1,40 @@
+plugins {
+    id 'application'
+    id 'org.beryx.runtime' version '1.13.0'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+
+dependencies {
+    implementation 'org.json:json:20160810'
+    implementation 'com.formdev:flatlaf:1.5'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+}
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = "17"
+targetCompatibility = "17"
+
+application {
+    mainClass = "main.Main"
+}
+
+runtime {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    modules = ['java.base', 'java.desktop', 'java.logging']
+    launcher {
+        noConsole = false
+    }
+    jpackage {
+        imageOptions = ['--icon', 'resources/TheWayIcon40.ico']
+    }
+}

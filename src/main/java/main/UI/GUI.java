@@ -7,6 +7,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.File;
+import java.io.InputStream;
 
 public class GUI {
     static private JPanel gui;
@@ -200,11 +201,16 @@ public class GUI {
     }
 
     private static void loadIcon() {
-        String iconPath = "resources/TheWayIcon40.png";
-        File iconFile = new File(iconPath);
-        if (iconFile.exists()) {
-            ImageIcon icon = new ImageIcon(iconPath);
-            frame.setIconImage(icon.getImage());
+        try {
+            InputStream in = GUI.class.getClassLoader()
+                    .getResourceAsStream("TheWayIcon40.png");
+            if (in != null) {
+                byte[] bytes = in.readAllBytes();
+                ImageIcon icon = new ImageIcon(bytes);
+                frame.setIconImage(icon.getImage());
+            }
+        } catch (Exception ignored) {
+            // No icon
         }
     }
 }
