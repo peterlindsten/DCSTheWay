@@ -1,5 +1,4 @@
 import main.Waypoints.PlanesCommands.A10CII;
-import main.Waypoints.PlanesCommands.F16;
 import main.models.Hemisphere;
 import main.models.Point;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class A10Test {
 
         //given
         List<Point> dcsPoints = List.of(
-                new Point("37.25046487617", "115.80890238447", "1357.7307128906", Hemisphere.NORTH, Hemisphere.WEST)
+                new Point("37.25046487617", "115.80890238447", "1359.2989501953", Hemisphere.NORTH, Hemisphere.WEST)
         );
 
         //when
@@ -31,7 +30,7 @@ public class A10Test {
 
         //then
         List<Point> expectedPoints = List.of(
-                new Point("3715028", "11548534", "4456", Hemisphere.NORTH, Hemisphere.WEST)
+                new Point("3715028", "11548534", "4460", Hemisphere.NORTH, Hemisphere.WEST)
         );
         assertEquals(a10Points, expectedPoints);
     }

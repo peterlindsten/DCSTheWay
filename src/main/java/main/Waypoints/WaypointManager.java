@@ -4,6 +4,7 @@ import main.DCSconnection.PortListenerThread;
 import main.DCSconnection.PortSender;
 import main.UI.GUI;
 import main.Waypoints.PlanesCommands.*;
+import main.models.F15EOptions;
 import main.models.Hemisphere;
 import main.models.Point;
 
@@ -66,11 +67,15 @@ public class WaypointManager {
                 List<Point> ajs37Coords = AJS37.getCoords(waypoints);
                 String dataToSend = AJS37.getCommands(ajs37Coords, offset).toString();
                 PortSender.send(dataToSend);
+            } else if (model.equals("F-15ESE")) {
+                F15EOptions options = GUI.f15eDialog();
+                List<Point> f15eCoords = F15E.getCoords(waypoints);
+                String dataToSend = F15E.getCommands(f15eCoords, options).toString();
+                PortSender.send(dataToSend);
             } else {
                 GUI.error("You are not flying a supported module.");
             }
         }
-
     }
 
     public static boolean saveWaypointSuccessful() {

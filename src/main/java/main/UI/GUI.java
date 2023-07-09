@@ -2,15 +2,15 @@ package main.UI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import main.Waypoints.WaypointManager;
+import main.models.F15EOptions;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-import java.io.File;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class GUI {
-    static private JPanel gui;
     static private JFrame frame;
     static private Crosshair crosshair;
     static private JTextArea textArea;
@@ -23,7 +23,7 @@ public class GUI {
     public static void show() {
         FlatDarkLaf.setup();
         crosshair = new Crosshair();
-        gui = new JPanel(new GridLayout(0, 1, 10, 10));
+        JPanel gui = new JPanel(new GridLayout(0, 1, 10, 10));
         gui.setBorder(new EmptyBorder(10, 10, 10, 10));
         beginSelectionButton = new JButton("Start selecting on map");
         textArea = new JTextArea(1, 10);
@@ -31,9 +31,7 @@ public class GUI {
         selectPointButton = new JButton("Select point");
         clearPointsButton = new JButton("Discard points");
 
-        beginSelectionButton.addActionListener(e -> {
-            emptySelectionState();
-        });
+        beginSelectionButton.addActionListener(e -> emptySelectionState());
         transferToDCSButton.addActionListener(e -> {
             WaypointManager.transfer();
             transferredState();
@@ -136,7 +134,7 @@ public class GUI {
     }
 
     public static String multiChoice(String question, String[] choices) {
-        JDialog dialog = new JDialog(frame, "Choose an options", true);
+        JDialog dialog = new JDialog(frame, "Choose an option", true);
         JOptionPane optionPane = new JOptionPane(question, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, choices, choices[0]);
 
         Point framePoint = frame.getLocation();
@@ -159,6 +157,51 @@ public class GUI {
         dialog.pack();
         dialog.setVisible(true);
         return (String) optionPane.getValue();
+    }
+
+    public static F15EOptions f15eDialog() {
+        JDialog dialog = new JDialog(frame, "Choose options", true);
+        Object[] options = {"Pilot", "WSO"};
+        JOptionPane optionPane = new JOptionPane("Seat?\nWarning: Cannot overwrite current SP", JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
+
+        JPanel dialogPanel = new JPanel(new GridLayout(1, 0, 0, 10));
+        JPanel dialogTable = new JPanel(new GridLayout(0, 2, 10, 10));
+        dialogTable.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        JComboBox<String> seriesBox = new JComboBox<>(new String[]{"A", "B", "C"});
+        seriesBox.setSelectedIndex(1);
+        seriesBox.setEditable(false);
+        JComboBox<String> firstBox = new JComboBox<>(new String[]{"1", "2", "3", "4", "5"});
+        firstBox.setSelectedIndex(0);
+        firstBox.setEditable(true);
+        dialogTable.add(new JLabel("SP Series"));
+        dialogTable.add(seriesBox);
+        dialogTable.add(new JLabel("First SP"));
+        dialogTable.add(firstBox);
+        dialogPanel.add(optionPane);
+        dialogPanel.add(dialogTable);
+
+        Point framePoint = frame.getLocation();
+        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
+        dialog.setContentPane(dialogPanel);
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setResizable(false);
+        dialog.setFocusableWindowState(false);
+        optionPane.addPropertyChangeListener(
+                e -> {
+                    String prop = e.getPropertyName();
+                    if (dialog.isVisible()
+                            && (e.getSource() == optionPane)
+                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                        dialog.setVisible(false);
+                    }
+                });
+
+        dialog.pack();
+        dialog.setVisible(true);
+
+        return new F15EOptions("Pilot".equals(optionPane.getValue()),
+                (String) seriesBox.getSelectedObjects()[0],
+                Integer.parseInt((String) firstBox.getEditor().getItem()));
     }
 
     private static void standbyState() {
@@ -202,12 +245,13 @@ public class GUI {
 
     private static void loadIcon() {
         try {
-            InputStream in = GUI.class.getClassLoader()
-                    .getResourceAsStream("TheWayIcon40.png");
-            if (in != null) {
-                byte[] bytes = in.readAllBytes();
-                ImageIcon icon = new ImageIcon(bytes);
-                frame.setIconImage(icon.getImage());
+            try (InputStream in = GUI.class.getClassLoader()
+                    .getResourceAsStream("TheWayIcon40.png")) {
+                if (in != null) {
+                    byte[] bytes = in.readAllBytes();
+                    ImageIcon icon = new ImageIcon(bytes);
+                    frame.setIconImage(icon.getImage());
+                }
             }
         } catch (Exception ignored) {
             // No icon
