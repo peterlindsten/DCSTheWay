@@ -42,3 +42,18 @@ runtime {
         imageOptions = ['--icon', 'resources/TheWayIcon40.ico']
     }
 }
+
+tasks.register('prepareRelease', Copy) {
+    from(projectDir.toPath().resolve('TheWay.lua'),
+            projectDir.toPath().resolve('README.md'),
+            projectDir.toPath().resolve('LICENSE'))
+    into(projectDir.toPath().resolve('build/jpackage/DCSTheWay'))
+}
+tasks.prepareRelease.dependsOn(tasks.jpackageImage)
+
+tasks.register('release', Zip) {
+    from(projectDir.toPath().resolve('build/jpackage/DCSTheWay'))
+    archiveExtension = "zip"
+    destinationDirectory = project.buildDir
+}
+tasks.release.dependsOn(tasks.prepareRelease)
