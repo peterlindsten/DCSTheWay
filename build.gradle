@@ -43,17 +43,14 @@ runtime {
     }
 }
 
-tasks.register('prepareRelease', Copy) {
-    from(projectDir.toPath().resolve('TheWay.lua'),
-            projectDir.toPath().resolve('README.md'),
-            projectDir.toPath().resolve('LICENSE'))
-    into(projectDir.toPath().resolve('build/jpackage/DCSTheWay'))
-}
-tasks.prepareRelease.dependsOn(tasks.jpackageImage)
 
 tasks.register('release', Zip) {
-    from(projectDir.toPath().resolve('build/jpackage/DCSTheWay'))
+    from(projectDir.toPath().resolve('build/jpackage/DCSTheWay'),
+            projectDir.toPath().resolve('TheWay.lua'),
+            projectDir.toPath().resolve('README.md'),
+            projectDir.toPath().resolve('LICENSE'))
     archiveExtension = "zip"
     destinationDirectory = project.buildDir
+    duplicatesStrategy(DuplicatesStrategy.FAIL)
 }
-tasks.release.dependsOn(tasks.prepareRelease)
+tasks.release.dependsOn(tasks.jpackageImage)
