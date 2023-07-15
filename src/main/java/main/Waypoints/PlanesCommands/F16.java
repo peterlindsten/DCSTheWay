@@ -49,7 +49,7 @@ public class F16 {
             commandArray.put(new JSONObject().put("device", "17").put("code", "3035").put("delay", "20").put("activate", "-1").put("addDepress", "true"));
             commandArray.put(new JSONObject().put("device", "17").put("code", "3035").put("delay", "20").put("activate", "-1").put("addDepress", "true"));
             //check if latitude is N or S
-            if(coordinate.getLatitudeHemisphere()== Hemisphere.NORTH){
+            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
                 //press N
                 commandArray.put(new JSONObject().put("device", "17").put("code", "3004").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -57,7 +57,7 @@ public class F16 {
                 commandArray.put(new JSONObject().put("device", "17").put("code", "3010").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.getLatitude().toCharArray()){
+            for(char digit:coordinate.latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "17").put("code", "3003").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -96,7 +96,7 @@ public class F16 {
             //goto long field
             commandArray.put(new JSONObject().put("device", "17").put("code", "3035").put("delay", "20").put("activate", "-1").put("addDepress", "true"));
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()== Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
                 //press E
                 commandArray.put(new JSONObject().put("device", "17").put("code", "3008").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -104,7 +104,7 @@ public class F16 {
                 commandArray.put(new JSONObject().put("device", "17").put("code", "3006").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.getLongitude().toCharArray()){
+            for(char digit:coordinate.longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "17").put("code", "3003").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -143,7 +143,7 @@ public class F16 {
             //goto elevation field
             commandArray.put(new JSONObject().put("device", "17").put("code", "3035").put("delay", "20").put("activate", "-1").put("addDepress", "true"));
             //start entering elevation
-            for(char digit:coordinate.getElevation().toCharArray()){
+            for(char digit:coordinate.elevation().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "17").put("code", "3003").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -194,9 +194,9 @@ public class F16 {
     public static List<Point> getCoords(List<Point> dcsPoints){
         List<Point> f16Points = new ArrayList<>();
         for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
             DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
@@ -205,11 +205,11 @@ public class F16 {
             DecimalFormat latMinDf = new DecimalFormat("00.000");
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00.000");
-            String f16Latitude = latDegDf.format(dmmLat.getDegrees())+latMinDf.format(dmmLat.getMinutes()).replace(".", "");
-            String f16Longitude = longDegDf.format(dmmLong.getDegrees())+longMinDf.format(dmmLong.getMinutes()).replace(".", "");
+            String f16Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
+            String f16Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
             String f16Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var f16Point = new Point(f16Latitude, f16Longitude, f16Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var f16Point = new Point(f16Latitude, f16Longitude, f16Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             f16Points.add(f16Point);
         }
         return f16Points;

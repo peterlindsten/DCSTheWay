@@ -3,10 +3,7 @@ package main.Waypoints.PlanesCommands;
 import main.Utils.CoordinateUtils;
 import main.Utils.NumberUtils;
 import main.Utils.UnitConvertorUtils;
-import main.models.DMSCoordinate;
-import main.models.F15EOptions;
-import main.models.Hemisphere;
-import main.models.Point;
+import main.models.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -80,30 +77,30 @@ public class F15E {
 
             // Long
             commandArray.put(deviceCodeDelay(device, SHIFT));
-            if (coords.get(i).getLongitudeHemisphere() == Hemisphere.EAST) {
+            if (coords.get(i).longitudeHemisphere() == Hemisphere.EAST) {
                 commandArray.put(deviceCodeDelay(device, tenKeys[6]));
             } else {
                 commandArray.put(deviceCodeDelay(device, tenKeys[4]));
             }
-            for (char digit : coords.get(i).getLongitude().toCharArray()) {
+            for (char digit : coords.get(i).longitude().toCharArray()) {
                 commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
             }
             commandArray.put(deviceCodeDelay(device, "3003"));
 
             // Lat
             commandArray.put(deviceCodeDelay(device, SHIFT));
-            if (coords.get(i).getLatitudeHemisphere() == Hemisphere.NORTH) {
+            if (coords.get(i).latitudeHemisphere() == Hemisphere.NORTH) {
                 commandArray.put(deviceCodeDelay(device, tenKeys[2]));
             } else {
                 commandArray.put(deviceCodeDelay(device, tenKeys[8]));
             }
-            for (char digit : coords.get(i).getLatitude().toCharArray()) {
+            for (char digit : coords.get(i).latitude().toCharArray()) {
                 commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
             }
             commandArray.put(deviceCodeDelay(device, "3002"));
 
             // Elev
-            for (char digit : coords.get(i).getElevation().toCharArray()) {
+            for (char digit : coords.get(i).elevation().toCharArray()) {
                 commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
             }
             commandArray.put(deviceCodeDelay(device, "3007"));
@@ -119,24 +116,22 @@ public class F15E {
     public static List<Point> getCoords(List<Point> dcsPoints) {
         List<Point> f15ePoints = new ArrayList<>();
         for (Point dcsPoint : dcsPoints) {
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
-            DMSCoordinate dmsLat = CoordinateUtils.decimalToDMS(dcsLat);
-            DMSCoordinate dmsLong = CoordinateUtils.decimalToDMS(dcsLong);
+            DMMCoordinate dmsLat = CoordinateUtils.decimalToDMM(dcsLat);
+            DMMCoordinate dmsLong = CoordinateUtils.decimalToDMM(dcsLong);
 
             DecimalFormat latDegDf = new DecimalFormat("00");
-            DecimalFormat latMinDf = new DecimalFormat("00");
-            DecimalFormat latSecDf = new DecimalFormat("00");
+            DecimalFormat latMinDf = new DecimalFormat("00.000");
             DecimalFormat longDegDf = new DecimalFormat("000");
-            DecimalFormat longMinDf = new DecimalFormat("00");
-            DecimalFormat longSecDf = new DecimalFormat("00");
-            String f15eLat = latDegDf.format(dmsLat.getDegrees()) + latMinDf.format(dmsLat.getMinutes()) + latSecDf.format(dmsLat.getSeconds());
-            String f15eLong = longDegDf.format(dmsLong.getDegrees()) + longMinDf.format(dmsLong.getMinutes()) + longSecDf.format(dmsLong.getSeconds());
+            DecimalFormat longMinDf = new DecimalFormat("00.000");
+            String f15eLat = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes());
+            String f15eLong = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes());
             String f15eElev = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var f15ePoint = new Point(f15eLat, f15eLong, f15eElev, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var f15ePoint = new Point(f15eLat, f15eLong, f15eElev, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             f15ePoints.add(f15ePoint);
         }
         return f15ePoints;

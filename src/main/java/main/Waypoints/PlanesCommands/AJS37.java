@@ -43,11 +43,11 @@ public class AJS37 {
         commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "1", "false"));
         // Start entry
         for (int i = 0; i < coords.size() && i < (9 - offset); i++) {
-            for (char digit : coords.get(i).getLongitude().toCharArray()) {
+            for (char digit : coords.get(i).longitude().toCharArray()) {
                 // Digits
                 commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
             }
-            for (char digit : coords.get(i).getLatitude().toCharArray()) {
+            for (char digit : coords.get(i).latitude().toCharArray()) {
                 // Digits
                 commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
             }
@@ -68,9 +68,9 @@ public class AJS37 {
     public static List<Point> getCoords(List<Point> dcsPoints) {
         List<Point> ajs37points = new ArrayList<>();
         for (Point dcsPoint : dcsPoints) {
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMSCoordinate dmsLat = CoordinateUtils.decimalToDMS(dcsLat);
             DMSCoordinate dmsLong = CoordinateUtils.decimalToDMS(dcsLong);
@@ -81,11 +81,11 @@ public class AJS37 {
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00");
             DecimalFormat longSecDf = new DecimalFormat("00");
-            String ajs37Latitude = latDegDf.format(dmsLat.getDegrees()) + latMinDf.format(dmsLat.getMinutes()) + latSecDf.format(dmsLat.getSeconds());
-            String ajs37Longitude = longDegDf.format(dmsLong.getDegrees()).substring(1) + longMinDf.format(dmsLong.getMinutes()) + longSecDf.format(dmsLong.getSeconds());
+            String ajs37Latitude = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes()) + latSecDf.format(dmsLat.seconds());
+            String ajs37Longitude = longDegDf.format(dmsLong.degrees()).substring(1) + longMinDf.format(dmsLong.minutes()) + longSecDf.format(dmsLong.seconds());
             String ajs37Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var ajs37Point = new Point(ajs37Latitude, ajs37Longitude, ajs37Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var ajs37Point = new Point(ajs37Latitude, ajs37Longitude, ajs37Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             ajs37points.add(ajs37Point);
         }
         return ajs37points;

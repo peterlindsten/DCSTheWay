@@ -64,7 +64,7 @@ public class Ka50 {
                     break;
             }
             //Check if latitude is N or S
-            if (coords.get(i-1).getLatitudeHemisphere() == Hemisphere.NORTH) {
+            if (coords.get(i-1).latitudeHemisphere() == Hemisphere.NORTH) {
                 //press 0/+ for North
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3001").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -72,7 +72,7 @@ public class Ka50 {
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //Start typing latitude
-            for(char digit:coords.get(i-1).getLatitude().toCharArray()){
+            for(char digit:coords.get(i-1).latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -107,7 +107,7 @@ public class Ka50 {
                 }
             }
             //Check if longitude is E or W
-            if (coords.get(i-1).getLongitudeHemisphere() == Hemisphere.EAST) {
+            if (coords.get(i-1).longitudeHemisphere() == Hemisphere.EAST) {
                 //press 0/+ for East
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3001").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -115,7 +115,7 @@ public class Ka50 {
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //Start typing longitude
-            for(char digit:coords.get(i-1).getLongitude().toCharArray()){
+            for(char digit:coords.get(i-1).longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -161,9 +161,9 @@ public class Ka50 {
     public static List<Point> getCoords(List<Point> dcsPoints) {
         List<Point> Ka50Points = new ArrayList<>();
         for (Point dcsPoint : dcsPoints) {
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
             DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
@@ -172,11 +172,11 @@ public class Ka50 {
             DecimalFormat latMinDf = new DecimalFormat("00.0");
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00.0");
-            String Ka50Latitude = latDegDf.format(dmmLat.getDegrees()) + latMinDf.format(dmmLat.getMinutes()).replace(".", "");
-            String Ka50Longitude = longDegDf.format(dmmLong.getDegrees()) + longMinDf.format(dmmLong.getMinutes()).replace(".", "");
+            String Ka50Latitude = latDegDf.format(dmmLat.degrees()) + latMinDf.format(dmmLat.minutes()).replace(".", "");
+            String Ka50Longitude = longDegDf.format(dmmLong.degrees()) + longMinDf.format(dmmLong.minutes()).replace(".", "");
             String Ka50Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var Ka50Point = new Point(Ka50Latitude, Ka50Longitude, Ka50Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var Ka50Point = new Point(Ka50Latitude, Ka50Longitude, Ka50Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             Ka50Points.add(Ka50Point);
         }
         return Ka50Points;

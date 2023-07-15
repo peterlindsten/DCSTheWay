@@ -34,7 +34,7 @@ public class AH64 {
             commandArray.put(new JSONObject().put("device", "29").put("code", "3001").put("delay", "10").put("activate", "1").put("addDepress", "true"));
 
             //check if latitude is N or S
-            if (coordinate.getLatitudeHemisphere() == Hemisphere.NORTH) {
+            if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
                 commandArray.put(new JSONObject().put("device", "29").put("code", "3020").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -42,7 +42,7 @@ public class AH64 {
                 commandArray.put(new JSONObject().put("device", "29").put("code", "3025").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.getLatitude().toCharArray()){
+            for(char digit:coordinate.latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "29").put("code", "3033").put("delay", "3").put("activate", "1").put("addDepress", "true"));
@@ -78,7 +78,7 @@ public class AH64 {
             }
 
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()== Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
                 //press E
                 commandArray.put(new JSONObject().put("device", "29").put("code", "3011").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -86,7 +86,7 @@ public class AH64 {
                 commandArray.put(new JSONObject().put("device", "29").put("code", "3029").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.getLongitude().toCharArray()){
+            for(char digit:coordinate.longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "29").put("code", "3033").put("delay", "3").put("activate", "1").put("addDepress", "true"));
@@ -147,7 +147,7 @@ public class AH64 {
             commandArray.put(new JSONObject().put("device", "30").put("code", "3001").put("delay", "10").put("activate", "1").put("addDepress", "true"));
 
             //check if latitude is N or S
-            if (coordinate.getLatitudeHemisphere() == Hemisphere.NORTH) {
+            if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
                 commandArray.put(new JSONObject().put("device", "30").put("code", "3020").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -155,7 +155,7 @@ public class AH64 {
                 commandArray.put(new JSONObject().put("device", "30").put("code", "3025").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.getLatitude().toCharArray()){
+            for(char digit:coordinate.latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "30").put("code", "3033").put("delay", "3").put("activate", "1").put("addDepress", "true"));
@@ -191,7 +191,7 @@ public class AH64 {
             }
 
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()== Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
                 //press E
                 commandArray.put(new JSONObject().put("device", "30").put("code", "3011").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -199,7 +199,7 @@ public class AH64 {
                 commandArray.put(new JSONObject().put("device", "30").put("code", "3029").put("delay", "3").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.getLongitude().toCharArray()){
+            for(char digit:coordinate.longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "30").put("code", "3033").put("delay", "3").put("activate", "1").put("addDepress", "true"));
@@ -243,9 +243,9 @@ public class AH64 {
     public static List<Point> getCoords(List<Point> dcsPoints){
         List<Point> ah64Points = new ArrayList<>();
         for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
             DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
@@ -254,11 +254,11 @@ public class AH64 {
             DecimalFormat latMinDf = new DecimalFormat("00.00");
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00.00");
-            String ah64Latitude = latDegDf.format(dmmLat.getDegrees())+latMinDf.format(dmmLat.getMinutes()).replace(".", "");
-            String ah64Longitude = longDegDf.format(dmmLong.getDegrees())+longMinDf.format(dmmLong.getMinutes()).replace(".", "");
+            String ah64Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
+            String ah64Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
             String ah64Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var ah64Point = new Point(ah64Latitude, ah64Longitude, ah64Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var ah64Point = new Point(ah64Latitude, ah64Longitude, ah64Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             ah64Points.add(ah64Point);
         }
         return ah64Points;

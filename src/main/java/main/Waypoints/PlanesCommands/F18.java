@@ -59,7 +59,7 @@ public class F18 {
             // press position 1
             commandArray.put(new JSONObject().put("device", "25").put("code", "3010").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //check if latitude is N or S
-            if(coordinate.getLatitudeHemisphere()== Hemisphere.NORTH){
+            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
                 //press N north
                 commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -67,7 +67,7 @@ public class F18 {
                 commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start entering first latitude digits
-            String latitude = coordinate.getLatitude();
+            String latitude = coordinate.latitude();
             String firstLat = latitude.substring(0, latitude.length()-4);
             String last4Lat = latitude.substring(latitude.length()-4);
             for(char digit:firstLat.toCharArray()){
@@ -144,7 +144,7 @@ public class F18 {
             //press enter
             commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()== Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
                 //press E east
                 commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -152,7 +152,7 @@ public class F18 {
                 commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start entering first longitude digits
-            String longitude = coordinate.getLongitude();
+            String longitude = coordinate.longitude();
             String firstLong = longitude.substring(0, longitude.length()-4);
             String last4Long = longitude.substring(longitude.length()-4);
             for(char digit:firstLong.toCharArray()){
@@ -233,7 +233,7 @@ public class F18 {
             // press position 1 to select ft
             commandArray.put(new JSONObject().put("device", "25").put("code", "3010").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //start entering elevation
-            for(char digit:coordinate.getElevation().toCharArray()){
+            for(char digit:coordinate.elevation().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -277,9 +277,9 @@ public class F18 {
     public static ArrayList<Point> getCoords(List<Point> dcsPoints){
         ArrayList<Point> f18Points = new ArrayList<>();
         for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
             DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
@@ -288,11 +288,11 @@ public class F18 {
             DecimalFormat latMinDf = new DecimalFormat("00.0000");
             DecimalFormat longDegDf = new DecimalFormat("#00");
             DecimalFormat longMinDf = new DecimalFormat("00.0000");
-            String f18Latitude = latDegDf.format(dmmLat.getDegrees())+latMinDf.format(dmmLat.getMinutes()).replace(".", "");
-            String f18Longitude = longDegDf.format(dmmLong.getDegrees())+longMinDf.format(dmmLong.getMinutes()).replace(".", "");
+            String f18Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
+            String f18Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
             String f18Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var f18Point = new Point(f18Latitude, f18Longitude, f18Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var f18Point = new Point(f18Latitude, f18Longitude, f18Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             f18Points.add(f18Point);
         }
         return f18Points;

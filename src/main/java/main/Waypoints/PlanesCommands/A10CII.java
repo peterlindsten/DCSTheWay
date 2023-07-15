@@ -56,7 +56,7 @@ public class A10CII {
             //create new WP
             commandArray.put(new JSONObject().put("device", "9").put("code", "3007").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             //check if latitude is N or S
-            if(coordinate.getLatitudeHemisphere()== Hemisphere.NORTH){
+            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
                 //press N
                 commandArray.put(new JSONObject().put("device", "9").put("code", "3040").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -64,7 +64,7 @@ public class A10CII {
                 commandArray.put(new JSONObject().put("device", "9").put("code", "3045").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.getLatitude().toCharArray()){
+            for(char digit:coordinate.latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "9").put("code", "3015").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -101,7 +101,7 @@ public class A10CII {
             //enter into field
             commandArray.put(new JSONObject().put("device", "9").put("code", "3003").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()== Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
                 //press E
                 commandArray.put(new JSONObject().put("device", "9").put("code", "3031").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -109,7 +109,7 @@ public class A10CII {
                 commandArray.put(new JSONObject().put("device", "9").put("code", "3049").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.getLongitude().toCharArray()){
+            for(char digit:coordinate.longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "9").put("code", "3015").put("delay", "0").put("activate", "1").put("addDepress", "true"));
@@ -153,9 +153,9 @@ public class A10CII {
     public static ArrayList<Point> getCoords(List<Point> dcsPoints){
         ArrayList<Point> a10Points = new ArrayList<>();
         for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
             DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
@@ -164,11 +164,11 @@ public class A10CII {
             DecimalFormat latMinDf = new DecimalFormat("00.000");
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00.000");
-            String a10Latitude = latDegDf.format(dmmLat.getDegrees())+latMinDf.format(dmmLat.getMinutes()).replace(".", "");
-            String a10Longitude = longDegDf.format(dmmLong.getDegrees())+longMinDf.format(dmmLong.getMinutes()).replace(".", "");
+            String a10Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
+            String a10Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
             String a10Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var a10Point = new Point(a10Latitude, a10Longitude, a10Elevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var a10Point = new Point(a10Latitude, a10Longitude, a10Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             a10Points.add(a10Point);
         }
         return a10Points;

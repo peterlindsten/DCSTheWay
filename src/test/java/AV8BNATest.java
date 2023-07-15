@@ -20,7 +20,7 @@ public class AV8BNATest {
 
         //then
         List<Point> expectedPoints = List.of(
-                new Point("371501", "1154832", "4454", Hemisphere.NORTH, Hemisphere.WEST)
+                new Point("371502", "1154832", "4454", Hemisphere.NORTH, Hemisphere.WEST)
         );
         assertEquals(av8bnaPoints, expectedPoints);
     }

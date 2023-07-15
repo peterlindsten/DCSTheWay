@@ -16,8 +16,8 @@ public class CoordinateTest {
         DMSCoordinate dmsCoord = CoordinateUtils.decimalToDMS(decimalCoord);
 
         //then
-        assertEquals(dmsCoord.getDegrees(), 42);
-        assertEquals(dmsCoord.getMinutes(), 21);
-        assertEquals(dmsCoord.getSeconds(), 36);
+        assertEquals(dmsCoord.degrees(), 42);
+        assertEquals(dmsCoord.minutes(), 21);
+        assertEquals(dmsCoord.seconds(), 36);
     }
 }

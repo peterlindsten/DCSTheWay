@@ -4,6 +4,7 @@ import main.models.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 public class CoordinateUtils {
     public static DMMCoordinate decimalToDMM(BigDecimal decimalCoordinate){
@@ -17,7 +18,7 @@ public class CoordinateUtils {
         BigDecimal minutesDecimal = decimalCoordinate.remainder(BigDecimal.ONE).multiply(new BigDecimal(60));
         int minutes = Integer.parseInt(minutesDecimal.toBigInteger().toString());
         BigDecimal secondsDecimal = minutesDecimal.remainder(BigDecimal.ONE).multiply(new BigDecimal(60));
-        int seconds = Integer.parseInt(secondsDecimal.toBigInteger().toString());
+        int seconds = Integer.parseInt(secondsDecimal.setScale(0, RoundingMode.HALF_UP).toBigInteger().toString());
         return new DMSCoordinate(degrees, minutes, seconds);
     }
 }

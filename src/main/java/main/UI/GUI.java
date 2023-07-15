@@ -1,6 +1,8 @@
 package main.UI;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import main.DCSconnection.PortListenerThread;
+import main.Utils.CoordinateUtils;
 import main.Waypoints.WaypointManager;
 import main.models.F15EOptions;
 
@@ -8,6 +10,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.Arrays;
 
 public class GUI {
@@ -18,6 +21,7 @@ public class GUI {
     static private JButton selectPointButton;
     static private JButton transferToDCSButton;
     static private JButton clearPointsButton;
+    static private JTextArea debug;
 
 
     public static void show() {
@@ -30,6 +34,8 @@ public class GUI {
         transferToDCSButton = new JButton("Begin transfer to DCS");
         selectPointButton = new JButton("Select point");
         clearPointsButton = new JButton("Discard points");
+        debug = new JTextArea(3, 10);
+
 
         beginSelectionButton.addActionListener(e -> emptySelectionState());
         transferToDCSButton.addActionListener(e -> {
@@ -41,6 +47,10 @@ public class GUI {
             if (WaypointManager.saveWaypointSuccessful()) {
                 refreshWaypointCount();
                 populatedSelectionState();
+                debug.setText("Lat: " + CoordinateUtils.decimalToDMS(new BigDecimal(PortListenerThread.getLatitude())) +
+                        "\nLong: " + CoordinateUtils.decimalToDMS(new BigDecimal(PortListenerThread.getLongitude())) +
+                        "\nElev: " + PortListenerThread.getElevation());
+                debug.updateUI();
             } else {
                 error("No connection to DCS detected.");
                 standbyState();
@@ -58,6 +68,7 @@ public class GUI {
         gui.add(selectPointButton);
         gui.add(clearPointsButton);
         gui.add(transferToDCSButton);
+        //gui.add(debug);
 
         standbyState();
         frame = new JFrame("The Way");

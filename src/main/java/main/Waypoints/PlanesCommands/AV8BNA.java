@@ -61,7 +61,7 @@ public class AV8BNA {
             //Select ODU option 2 to enter latitude
             commandArray.put(new JSONObject().put("device", "24").put("code", "3251").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //check if latitude is N or S
-            if(coordinate.getLatitudeHemisphere()== Hemisphere.NORTH){
+            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
                 //press N
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3303").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -69,7 +69,7 @@ public class AV8BNA {
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3311").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.getLatitude().toCharArray()){
+            for(char digit:coordinate.latitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "23").put("code", "3302").put("delay", "10").put("activate", "1").put("addDepress", "true"));
@@ -108,7 +108,7 @@ public class AV8BNA {
             //Select ODU option 2 to enter longitude -- removed
 //            commandArray.put(new JSONObject().put("device", "24").put("code", "3251").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //check if longitude is E or W
-            if(coordinate.getLongitudeHemisphere()==Hemisphere.EAST){
+            if(coordinate.longitudeHemisphere()==Hemisphere.EAST){
                 //press E
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3308").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -116,7 +116,7 @@ public class AV8BNA {
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3306").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.getLongitude().toCharArray()){
+            for(char digit:coordinate.longitude().toCharArray()){
                 switch (digit){
                     case '1':
                         commandArray.put(new JSONObject().put("device", "23").put("code", "3302").put("delay", "10").put("activate", "1").put("addDepress", "true"));
@@ -166,9 +166,9 @@ public class AV8BNA {
     public static List<Point> getCoords(List<Point> dcsPoints) {
         List<Point> av8bnaPoints = new ArrayList<>();
         for (Point dcsPoint : dcsPoints) {
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.getLatitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.getLongitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.getElevation());
+            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
+            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
             DMSCoordinate dmsLat = CoordinateUtils.decimalToDMS(dcsLat);
             DMSCoordinate dmsLong = CoordinateUtils.decimalToDMS(dcsLong);
@@ -179,11 +179,11 @@ public class AV8BNA {
             DecimalFormat longDegDf = new DecimalFormat("000");
             DecimalFormat longMinDf = new DecimalFormat("00");
             DecimalFormat longSecDf = new DecimalFormat("00");
-            String av8bnaLatitude = latDegDf.format(dmsLat.getDegrees()) + latMinDf.format(dmsLat.getMinutes()) + latSecDf.format(dmsLat.getSeconds());
-            String av8bnaLongitude = longDegDf.format(dmsLong.getDegrees()) + longMinDf.format(dmsLong.getMinutes()) + longSecDf.format(dmsLong.getSeconds());
+            String av8bnaLatitude = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes()) + latSecDf.format(dmsLat.seconds());
+            String av8bnaLongitude = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes()) + longSecDf.format(dmsLong.seconds());
             String av8bnaElevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
 
-            var av8bnaPoint = new Point(av8bnaLatitude, av8bnaLongitude, av8bnaElevation, dcsPoint.getLatitudeHemisphere(), dcsPoint.getLongitudeHemisphere());
+            var av8bnaPoint = new Point(av8bnaLatitude, av8bnaLongitude, av8bnaElevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
             av8bnaPoints.add(av8bnaPoint);
         }
         return av8bnaPoints;
