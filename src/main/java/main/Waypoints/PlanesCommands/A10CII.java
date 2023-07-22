@@ -1,20 +1,17 @@
 package main.Waypoints.PlanesCommands;
 
 import main.Utils.CoordinateUtils;
-import main.Utils.UnitConvertorUtils;
-import main.models.DMMCoordinate;
 import main.models.Hemisphere;
 import main.models.Point;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-public class A10CII {
-    public static JSONArray getCommands(ArrayList<Point> coords){
+public class A10CII implements Aircraft {
+    @Override
+    public JSONArray getCommands(List<Point> dcsPoints) {
+        var coords = getCoords(dcsPoints);
             /*
            button list, all are device 9
            LSK 3L  3001
@@ -45,132 +42,62 @@ public class A10CII {
 
            */
 
-        JSONArray commandArray = new JSONArray();
+        var commandArray = new JSONArray();
 
 
         //go to WP page
-        commandArray.put(new JSONObject().put("device", "9").put("code", "3011").put("delay", "10").put("activate", "1").put("addDepress", "true"));
+        commandArray.put(codeDelay("3011", "10"));
         //goto WAYPOINT page
-        commandArray.put(new JSONObject().put("device", "9").put("code", "3005").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-        for (Point coordinate:coords) {
+        commandArray.put(code("3005"));
+        for (Point coordinate : coords) {
             //create new WP
-            commandArray.put(new JSONObject().put("device", "9").put("code", "3007").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(code("3007"));
             //check if latitude is N or S
-            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
+            if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
-                commandArray.put(new JSONObject().put("device", "9").put("code", "3040").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(code("3040"));
             } else {
                 //press S
-                commandArray.put(new JSONObject().put("device", "9").put("code", "3045").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(code("3045"));
             }
             //start typing latitude
-            for(char digit:coordinate.latitude().toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3015").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3016").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3017").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
+            for (char digit : coordinate.latitude().toCharArray()) {
+                commandArray.put(digitCommand(digit));
             }
             //enter into field
-            commandArray.put(new JSONObject().put("device", "9").put("code", "3003").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(code("3003"));
             //check if longitude is E or W
-            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
+            if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E
-                commandArray.put(new JSONObject().put("device", "9").put("code", "3031").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(code("3031"));
             } else {
                 //press W
-                commandArray.put(new JSONObject().put("device", "9").put("code", "3049").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(code("3049"));
             }
             //start typing longitude
-            for(char digit:coordinate.longitude().toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3015").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3016").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3017").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "9").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
+            for (char digit : coordinate.longitude().toCharArray()) {
+                commandArray.put(digitCommand(digit));
             }
             //enter into field
-            commandArray.put(new JSONObject().put("device", "9").put("code", "3004").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(code("3004"));
         }
 
         return commandArray;
     }
 
-    public static ArrayList<Point> getCoords(List<Point> dcsPoints){
-        ArrayList<Point> a10Points = new ArrayList<>();
-        for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
+    private static JSONObject digitCommand(char digit) {
+        return digit == '0' ? code("3024") : code(Integer.toString(Character.getNumericValue(digit) + 3014));
+    }
 
-            DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
-            DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
+    private static JSONObject code(String code) {
+        return codeDelay(code, "0");
+    }
 
-            DecimalFormat latDegDf = new DecimalFormat("00");
-            DecimalFormat latMinDf = new DecimalFormat("00.000");
-            DecimalFormat longDegDf = new DecimalFormat("000");
-            DecimalFormat longMinDf = new DecimalFormat("00.000");
-            String a10Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
-            String a10Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
-            String a10Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
+    private static JSONObject codeDelay(String code, String delay) {
+        return new JSONObject().put("device", "9").put("code", code).put("delay", delay).put("activate", "1").put("addDepress", "true");
+    }
 
-            var a10Point = new Point(a10Latitude, a10Longitude, a10Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
-            a10Points.add(a10Point);
-        }
-        return a10Points;
+    public static List<Point> getCoords(List<Point> dcsPoints) {
+        return CoordinateUtils.dcsToDmmFtPoints(dcsPoints, "00.000", true);
     }
 }

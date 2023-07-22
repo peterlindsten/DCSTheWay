@@ -4,7 +4,6 @@ import main.DCSconnection.PortListenerThread;
 import main.DCSconnection.PortSender;
 import main.UI.GUI;
 import main.Waypoints.PlanesCommands.*;
-import main.models.F15EOptions;
 import main.models.Hemisphere;
 import main.models.Point;
 
@@ -12,68 +11,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WaypointManager {
-    static private ArrayList<Point> waypoints = new ArrayList<>();
+    static private final ArrayList<Point> waypoints = new ArrayList<>();
 
     public static void transfer() {
         String model = PortListenerThread.getPlaneModel();
 
         if (model != null && !waypoints.isEmpty()) {
-            if (model.equals("F-16C_50")) {
-                List<Point> f16Coords = F16.getCoords(waypoints);
-                String dataToSend = F16.getCommands(f16Coords).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("FA-18C_hornet")) {
-                GUI.warning("Please make sure that: \n" +
-                        "1. PRECISE option is boxed in HSI > DATA\n" +
-                        "2. You are not in the TAC menu\n" +
-                        "3. You are in the 00°00.0000' coordinate format");
-                ArrayList<Point> f18Coords = F18.getCoords(waypoints);
-                String dataToSend = F18.getCommands(f18Coords).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("A-10C_2") || model.equals("A-10C")) {
-                ArrayList<Point> a10Coords = A10CII.getCoords(waypoints);
-                String dataToSend = A10CII.getCommands(a10Coords).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("M-2000C")) {
-                List<Point> m2000Coords = M2000.getCoords(waypoints);
-                String dataToSend = M2000.getCommands(m2000Coords).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("AV8BNA")) {
-                List<Point> av8bnaCoords = AV8BNA.getCoords(waypoints);
-                String dataToSend = AV8BNA.getCommands(av8bnaCoords).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("Ka-50")) {
-                if (waypoints.size() > 6) {
-                    GUI.error("The Ka-50 can store a maximum of 6 waypoints. ");
-                } else {
-                    List<Point> Ka50Coords = Ka50.getCoords(waypoints);
-                    String dataToSend = Ka50.getCommands(Ka50Coords).toString();
+            Aircraft a = null;
+            switch (model) {
+                case "F-16C_50" -> a = new F16();
+                case "FA-18C_hornet" -> {
+                    GUI.warning("""
+                            Please make sure that:\s
+                            1. PRECISE option is boxed in HSI > DATA
+                            2. You are not in the TAC menu
+                            3. You are in the 00°00.0000' coordinate format""");
+                    ArrayList<Point> f18Coords = F18.getCoords(waypoints);
+                    String dataToSend = F18.getCommands(f18Coords).toString();
                     PortSender.send(dataToSend);
                 }
-            } else if (model.equals("AH-64D_BLK_II")) {
-                String choice = GUI.choice("Are you in the pilot seat?", "Yes", "No, I am CPG");
-                if (choice.equals("Yes")) {
-                    List<Point> ah64Coords = AH64.getCoords(waypoints);
-                    String dataToSend = AH64.getPilotCommands(ah64Coords).toString();
-                    PortSender.send(dataToSend);
-                } else {
-                    List<Point> ah64Coords = AH64.getCoords(waypoints);
-                    String dataToSend = AH64.getCPGCommands(ah64Coords).toString();
+                case "A-10C_2", "A-10C" -> a = new A10CII();
+                case "M-2000C" -> {
+                    List<Point> m2000Coords = M2000.getCoords(waypoints);
+                    String dataToSend = M2000.getCommands(m2000Coords).toString();
                     PortSender.send(dataToSend);
                 }
-            } else if (model.equals("AJS37")) {
-                int offset = Integer.parseInt(GUI.multiChoice("First in sequence?",
-                        new String[]{"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"}).substring(1)) - 1;
-                List<Point> ajs37Coords = AJS37.getCoords(waypoints);
-                String dataToSend = AJS37.getCommands(ajs37Coords, offset).toString();
-                PortSender.send(dataToSend);
-            } else if (model.equals("F-15ESE")) {
-                F15EOptions options = GUI.f15eDialog();
-                List<Point> f15eCoords = F15E.getCoords(waypoints);
-                String dataToSend = F15E.getCommands(f15eCoords, options).toString();
-                PortSender.send(dataToSend);
-            } else {
-                GUI.error("You are not flying a supported module.");
+                case "AV8BNA" -> {
+                    List<Point> av8bnaCoords = AV8BNA.getCoords(waypoints);
+                    String dataToSend = AV8BNA.getCommands(av8bnaCoords).toString();
+                    PortSender.send(dataToSend);
+                }
+                case "Ka-50" -> {
+                    if (waypoints.size() > 6) {
+                        GUI.error("The Ka-50 can store a maximum of 6 waypoints. ");
+                    } else {
+                        List<Point> Ka50Coords = Ka50.getCoords(waypoints);
+                        String dataToSend = Ka50.getCommands(Ka50Coords).toString();
+                        PortSender.send(dataToSend);
+                    }
+                }
+                case "AH-64D_BLK_II" -> a = new AH64();
+                case "AJS37" -> a = new AJS37();
+                case "F-15ESE" -> a = new F15E();
+                default -> GUI.error("You are not flying a supported module.");
+            }
+            if (null != a) {
+                PortSender.send(a.getCommands(waypoints).toString());
             }
         }
     }

@@ -1,5 +1,6 @@
 package main.Waypoints.PlanesCommands;
 
+import main.UI.GUI;
 import main.Utils.CoordinateUtils;
 import main.Utils.UnitConvertorUtils;
 import main.models.DMSCoordinate;
@@ -12,13 +13,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AJS37 {
-    public static JSONArray getCommands(List<Point> coords, int offset) {
+public class AJS37 implements Aircraft {
+    @Override
+    public JSONArray getCommands(List<Point> dcsPoints) {
+        var coords = getCoords(dcsPoints);
+        int offset = getArgs();
         /*
         The AJS37 has inherent limitations in its coordinate entry
         Only 6 digits are allowed for either Lat/Long, and there is no provision for hemispheres
         The game module "guesses" which hemisphere is meant as well as if there should be a 1 in front of the long value
-        Maps that cross hemispheres (Normandy) has unknown support
+        Maps that cross hemispheres (Normandy) or the 100 degree line (No maps currently), has unknown support
 
         NAVIGATIONPANEL 23 - Dataselector, in/out
         Actions
@@ -89,5 +93,10 @@ public class AJS37 {
             ajs37points.add(ajs37Point);
         }
         return ajs37points;
+    }
+
+    public static int getArgs() {
+        return Integer.parseInt(GUI.multiChoice("First in sequence?",
+                new String[]{"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"}).substring(1)) - 1;
     }
 }

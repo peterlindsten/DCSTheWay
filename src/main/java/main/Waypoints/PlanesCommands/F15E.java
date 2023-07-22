@@ -1,18 +1,15 @@
 package main.Waypoints.PlanesCommands;
 
+import main.UI.GUI;
 import main.Utils.CoordinateUtils;
 import main.Utils.NumberUtils;
-import main.Utils.UnitConvertorUtils;
 import main.models.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-public class F15E {
+public class F15E implements Aircraft {
 
     private static final String[] tenKeys = new String[] {
             "3036", // 0
@@ -27,7 +24,10 @@ public class F15E {
             "3032", // 9/C
     };
     private static final String SHIFT = "3033";
-    public static JSONArray getCommands(List<Point> coords, F15EOptions options) {
+    @Override
+    public JSONArray getCommands(List<Point> dcsPoints) {
+        F15EOptions options = GUI.f15eDialog();
+        List<Point> coords = F15E.getCoords(dcsPoints);
         /*
 
         UFC Pilot 56
@@ -82,9 +82,7 @@ public class F15E {
             } else {
                 commandArray.put(deviceCodeDelay(device, tenKeys[4]));
             }
-            for (char digit : coords.get(i).longitude().toCharArray()) {
-                commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
-            }
+            enterDigits(coords.get(i).longitude(), commandArray, device);
             commandArray.put(deviceCodeDelay(device, "3003"));
 
             // Lat
@@ -94,19 +92,21 @@ public class F15E {
             } else {
                 commandArray.put(deviceCodeDelay(device, tenKeys[8]));
             }
-            for (char digit : coords.get(i).latitude().toCharArray()) {
-                commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
-            }
+            enterDigits(coords.get(i).latitude(), commandArray, device);
             commandArray.put(deviceCodeDelay(device, "3002"));
 
             // Elev
-            for (char digit : coords.get(i).elevation().toCharArray()) {
-                commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
-            }
+            enterDigits(coords.get(i).elevation(), commandArray, device);
             commandArray.put(deviceCodeDelay(device, "3007"));
 
         }
         return commandArray;
+    }
+
+    private static void enterDigits(String coords, JSONArray commandArray, String device) {
+        for (char digit : coords.toCharArray()) {
+            commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
+        }
     }
 
     private static JSONObject deviceCodeDelay(String device, String code) {
@@ -114,26 +114,6 @@ public class F15E {
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {
-        List<Point> f15ePoints = new ArrayList<>();
-        for (Point dcsPoint : dcsPoints) {
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
-
-            DMMCoordinate dmsLat = CoordinateUtils.decimalToDMM(dcsLat);
-            DMMCoordinate dmsLong = CoordinateUtils.decimalToDMM(dcsLong);
-
-            DecimalFormat latDegDf = new DecimalFormat("00");
-            DecimalFormat latMinDf = new DecimalFormat("00.000");
-            DecimalFormat longDegDf = new DecimalFormat("000");
-            DecimalFormat longMinDf = new DecimalFormat("00.000");
-            String f15eLat = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes());
-            String f15eLong = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes());
-            String f15eElev = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
-
-            var f15ePoint = new Point(f15eLat, f15eLong, f15eElev, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
-            f15ePoints.add(f15ePoint);
-        }
-        return f15ePoints;
+        return CoordinateUtils.dcsToDmmFtPoints(dcsPoints, "00.000", true);
     }
 }

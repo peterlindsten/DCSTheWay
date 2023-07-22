@@ -43,7 +43,6 @@ runtime {
     }
 }
 
-
 tasks.register('release', Zip) {
     from(projectDir.toPath().resolve('build/jpackage/DCSTheWay'),
             projectDir.toPath().resolve('TheWay.lua'),

@@ -5,6 +5,9 @@ import main.models.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CoordinateUtils {
     public static DMMCoordinate decimalToDMM(BigDecimal decimalCoordinate){
@@ -20,5 +23,31 @@ public class CoordinateUtils {
         BigDecimal secondsDecimal = minutesDecimal.remainder(BigDecimal.ONE).multiply(new BigDecimal(60));
         int seconds = Integer.parseInt(secondsDecimal.setScale(0, RoundingMode.HALF_UP).toBigInteger().toString());
         return new DMSCoordinate(degrees, minutes, seconds);
+    }
+
+    public static List<Point> dcsToDmmFtPoints(List<Point> dcsPoints, String mmFormat, boolean stripDecimalPoint) {
+        List<Point> dmmFtPoints = new ArrayList<>();
+        for (Point dcsPoint : dcsPoints) {
+            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
+
+            DMMCoordinate dmsLat = decimalToDMM(new BigDecimal(dcsPoint.latitude()));
+            DMMCoordinate dmsLong = decimalToDMM(new BigDecimal(dcsPoint.longitude()));
+
+            DecimalFormat latDegDf = new DecimalFormat("00");
+            DecimalFormat latMinDf = new DecimalFormat(mmFormat);
+            DecimalFormat longDegDf = new DecimalFormat("000");
+            DecimalFormat longMinDf = new DecimalFormat(mmFormat);
+            String lat = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes());
+            String lon = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes());
+            if (stripDecimalPoint) {
+                lat = lat.replace(".", "");
+                lon = lon.replace(".", "");
+            }
+            String elev = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
+
+            var dmmFtPoint = new Point(lat, lon, elev, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
+            dmmFtPoints.add(dmmFtPoint);
+        }
+        return dmmFtPoints;
     }
 }
