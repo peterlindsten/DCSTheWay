@@ -1,9 +1,10 @@
 package main.Utils;
 
-import main.models.*;
+import main.models.DMMCoordinate;
+import main.models.DMSCoordinate;
+import main.models.Point;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -25,7 +26,15 @@ public class CoordinateUtils {
         return new DMSCoordinate(degrees, minutes, seconds);
     }
 
+    public static List<Point> dcsToDmmFtPoints(List<Point> dcsPoints, String mmFormat, String longFormat) {
+        return dcsToDmmFtPoints(dcsPoints, mmFormat, longFormat, true);
+    }
+
     public static List<Point> dcsToDmmFtPoints(List<Point> dcsPoints, String mmFormat, boolean stripDecimalPoint) {
+        return dcsToDmmFtPoints(dcsPoints, mmFormat, "000", stripDecimalPoint);
+    }
+
+    public static List<Point> dcsToDmmFtPoints(List<Point> dcsPoints, String mmFormat, String longFormat, boolean stripDecimalPoint) {
         List<Point> dmmFtPoints = new ArrayList<>();
         for (Point dcsPoint : dcsPoints) {
             Double dcsElev = Double.parseDouble(dcsPoint.elevation());
@@ -35,7 +44,7 @@ public class CoordinateUtils {
 
             DecimalFormat latDegDf = new DecimalFormat("00");
             DecimalFormat latMinDf = new DecimalFormat(mmFormat);
-            DecimalFormat longDegDf = new DecimalFormat("000");
+            DecimalFormat longDegDf = new DecimalFormat(longFormat);
             DecimalFormat longMinDf = new DecimalFormat(mmFormat);
             String lat = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes());
             String lon = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes());

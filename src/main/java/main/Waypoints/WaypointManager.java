@@ -20,16 +20,7 @@ public class WaypointManager {
             Aircraft a = null;
             switch (model) {
                 case "F-16C_50" -> a = new F16();
-                case "FA-18C_hornet" -> {
-                    GUI.warning("""
-                            Please make sure that:\s
-                            1. PRECISE option is boxed in HSI > DATA
-                            2. You are not in the TAC menu
-                            3. You are in the 00°00.0000' coordinate format""");
-                    ArrayList<Point> f18Coords = F18.getCoords(waypoints);
-                    String dataToSend = F18.getCommands(f18Coords).toString();
-                    PortSender.send(dataToSend);
-                }
+                case "FA-18C_hornet" -> a = new F18();
                 case "A-10C_2", "A-10C" -> a = new A10CII();
                 case "M-2000C" -> {
                     List<Point> m2000Coords = M2000.getCoords(waypoints);

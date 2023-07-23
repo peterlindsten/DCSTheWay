@@ -1,20 +1,22 @@
 package main.Waypoints.PlanesCommands;
 
+import main.UI.GUI;
 import main.Utils.CoordinateUtils;
-import main.Utils.UnitConvertorUtils;
-import main.models.DMMCoordinate;
 import main.models.Hemisphere;
 import main.models.Point;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 
-public class F18 {
-    public static JSONArray getCommands(ArrayList<Point> coords){
+public class F18 implements Aircraft {
+    public JSONArray getCommands(List<Point> dcsPoints) {
+        var coords = getCoords(dcsPoints);
+        GUI.warning("""
+                            Please make sure that:\s
+                            1. PRECISE option is boxed in HSI > DATA
+                            2. You are not in the TAC menu
+                            3. You are in the 00°00.0000' coordinate format""");
         /*
             AMPCD stuff, device 37
             PB 18 - 3028
@@ -41,260 +43,88 @@ public class F18 {
             CLR - 3028
          */
 
+        String ampcdDevice = "37";
+        String ufcDevice = "25";
+
         JSONArray commandArray = new JSONArray();
 
         //enter the SUPT menu
-        commandArray.put(new JSONObject().put("device", "37").put("code", "3028").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-        commandArray.put(new JSONObject().put("device", "37").put("code", "3028").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", "0"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", "0"));
         //select HSD
-        commandArray.put(new JSONObject().put("device", "37").put("code", "3012").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3012", "0"));
         //select DATA
-        commandArray.put(new JSONObject().put("device", "37").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3020", "0"));
 
-        for (Point coordinate:coords) {
+        for (Point coordinate : coords) {
             //increment steerpoint
-            commandArray.put(new JSONObject().put("device", "37").put("code", "3022").put("delay", "20").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ampcdDevice, "3022", "20"));
             //press UFC
-            commandArray.put(new JSONObject().put("device", "37").put("code", "3015").put("delay", "40").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ampcdDevice, "3015", "40"));
             // press position 1
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3010").put("delay", "10").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3010", "10"));
             //check if latitude is N or S
-            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
+            if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N north
-                commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3020", "0"));
             } else {
                 //press S south
-                commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3026", "0"));
             }
-            //start entering first latitude digits
-            String latitude = coordinate.latitude();
-            String firstLat = latitude.substring(0, latitude.length()-4);
-            String last4Lat = latitude.substring(latitude.length()-4);
-            for(char digit:firstLat.toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3025").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3027").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
-            }
+            // Enter lat
+            enterLatOrLongDigits(commandArray, ufcDevice, coordinate.latitude());
             //press enter
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
-            //start entering last 4 latitude digits
-            for(char digit:last4Lat.toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3025").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3027").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
-            }
-            //press enter
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
             //check if longitude is E or W
-            if(coordinate.longitudeHemisphere()== Hemisphere.EAST){
+            if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E east
-                commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3024", "0"));
             } else {
                 //press W west
-                commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3022", "0"));
             }
-            //start entering first longitude digits
-            String longitude = coordinate.longitude();
-            String firstLong = longitude.substring(0, longitude.length()-4);
-            String last4Long = longitude.substring(longitude.length()-4);
-            for(char digit:firstLong.toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3025").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3027").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
-            }
+            // Enter long
+            enterLatOrLongDigits(commandArray, ufcDevice, coordinate.longitude());
             //press enter
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
-            //start entering last 4 longitude digits
-            for(char digit:last4Long.toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3025").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3027").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
-            }
-            //press enter
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
             // press position 3 to select elevation
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3012").put("delay", "10").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3012", "10"));
             // press position 1 to select ft
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3010").put("delay", "10").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3010", "10"));
             //start entering elevation
-            for(char digit:coordinate.elevation().toCharArray()){
-                switch (digit){
-                    case '1':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3019").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '2':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3020").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '3':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3021").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '4':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3022").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '5':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3023").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '6':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3024").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '7':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3025").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '8':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3026").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '9':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3027").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                    case '0':
-                        commandArray.put(new JSONObject().put("device", "25").put("code", "3018").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-                        break;
-                }
+            for (char digit : coordinate.elevation().toCharArray()) {
+                commandArray.put(digitCommand(ufcDevice, digit));
             }
             //press enter
-            commandArray.put(new JSONObject().put("device", "25").put("code", "3029").put("delay", "30").put("activate", "1").put("addDepress", "true"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
         }
 
         return commandArray;
     }
 
-    public static ArrayList<Point> getCoords(List<Point> dcsPoints){
-        ArrayList<Point> f18Points = new ArrayList<>();
-        for (Point dcsPoint:dcsPoints){
-            BigDecimal dcsLat = new BigDecimal(dcsPoint.latitude());
-            BigDecimal dcsLong = new BigDecimal(dcsPoint.longitude());
-            Double dcsElev = Double.parseDouble(dcsPoint.elevation());
-
-            DMMCoordinate dmmLat = CoordinateUtils.decimalToDMM(dcsLat);
-            DMMCoordinate dmmLong = CoordinateUtils.decimalToDMM(dcsLong);
-
-            DecimalFormat latDegDf = new DecimalFormat("00");
-            DecimalFormat latMinDf = new DecimalFormat("00.0000");
-            DecimalFormat longDegDf = new DecimalFormat("#00");
-            DecimalFormat longMinDf = new DecimalFormat("00.0000");
-            String f18Latitude = latDegDf.format(dmmLat.degrees())+latMinDf.format(dmmLat.minutes()).replace(".", "");
-            String f18Longitude = longDegDf.format(dmmLong.degrees())+longMinDf.format(dmmLong.minutes()).replace(".", "");
-            String f18Elevation = String.valueOf(Math.round(UnitConvertorUtils.metersToFeet(dcsElev)));
-
-            var f18Point = new Point(f18Latitude, f18Longitude, f18Elevation, dcsPoint.latitudeHemisphere(), dcsPoint.longitudeHemisphere());
-            f18Points.add(f18Point);
+    private static void enterLatOrLongDigits(JSONArray commandArray, String ufcDevice, String latOrLong) {
+        String degreesMinutes = latOrLong.substring(0, latOrLong.length() - 4);
+        String minuteDecimals = latOrLong.substring(latOrLong.length() - 4);
+        for (char digit : degreesMinutes.toCharArray()) {
+            commandArray.put(digitCommand(ufcDevice, digit));
         }
-        return f18Points;
+        //press enter
+        commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
+        //start entering last 4 digits
+        for (char digit : minuteDecimals.toCharArray()) {
+            commandArray.put(digitCommand(ufcDevice, digit));
+        }
+    }
+
+    private static JSONObject digitCommand(String ufcDevice, char digit) {
+        return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018),"0");
+    }
+
+    private static JSONObject deviceCodeDelay(String device, String code, String delay) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", delay).put("activate", "1").put("addDepress", "true");
+    }
+
+    public static List<Point> getCoords(List<Point> dcsPoints) {
+        return CoordinateUtils.dcsToDmmFtPoints(dcsPoints, "00.0000", "#00");
     }
 }
