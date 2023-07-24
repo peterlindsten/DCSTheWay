@@ -11,7 +11,6 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.InputStream;
 import java.math.BigDecimal;
-import java.util.Arrays;
 
 public class GUI {
     static private JFrame frame;

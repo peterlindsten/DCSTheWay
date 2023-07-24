@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class AV8BNATest {
     @Test
-    void shouldReturnAV8BNACoordinateWhenGivenDCSPoint(){
+    void shouldReturnAV8BNACoordinateWhenGivenDCSPoint() {
         //given
         List<Point> dcsPoints = List.of(
                 new Point("37.25046487617", "115.80890238447", "1357.7307128906", Hemisphere.NORTH, Hemisphere.WEST)

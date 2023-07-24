@@ -11,7 +11,7 @@ import java.util.List;
 
 public class F15E implements Aircraft {
 
-    private static final String[] tenKeys = new String[] {
+    private static final String[] tenKeys = new String[]{
             "3036", // 0
             "3020", // 1/A
             "3021", // 2/N
@@ -24,6 +24,7 @@ public class F15E implements Aircraft {
             "3032", // 9/C
     };
     private static final String SHIFT = "3033";
+
     @Override
     public JSONArray getCommands(List<Point> dcsPoints) {
         F15EOptions options = GUI.f15eDialog();

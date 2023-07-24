@@ -52,7 +52,7 @@ public class AV8BNA {
         commandArray.put(new JSONObject().put("device", "26").put("code", "3201").put("delay", "10").put("activate", "1").put("addDepress", "true"));
         //Select DATA sub menu
         commandArray.put(new JSONObject().put("device", "26").put("code", "3201").put("delay", "10").put("activate", "1").put("addDepress", "true"));
-        for (Point coordinate:coords) {
+        for (Point coordinate : coords) {
             //Enter 99 to increment waypoint
             commandArray.put(new JSONObject().put("device", "23").put("code", "3312").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             commandArray.put(new JSONObject().put("device", "23").put("code", "3312").put("delay", "10").put("activate", "1").put("addDepress", "true"));
@@ -61,7 +61,7 @@ public class AV8BNA {
             //Select ODU option 2 to enter latitude
             commandArray.put(new JSONObject().put("device", "24").put("code", "3251").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //check if latitude is N or S
-            if(coordinate.latitudeHemisphere()== Hemisphere.NORTH){
+            if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3303").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -69,8 +69,8 @@ public class AV8BNA {
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3311").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             }
             //start typing latitude
-            for(char digit:coordinate.latitude().toCharArray()){
-                switch (digit){
+            for (char digit : coordinate.latitude().toCharArray()) {
+                switch (digit) {
                     case '1':
                         commandArray.put(new JSONObject().put("device", "23").put("code", "3302").put("delay", "10").put("activate", "1").put("addDepress", "true"));
                         break;
@@ -108,7 +108,7 @@ public class AV8BNA {
             //Select ODU option 2 to enter longitude -- removed
 //            commandArray.put(new JSONObject().put("device", "24").put("code", "3251").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             //check if longitude is E or W
-            if(coordinate.longitudeHemisphere()==Hemisphere.EAST){
+            if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3308").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -116,8 +116,8 @@ public class AV8BNA {
                 commandArray.put(new JSONObject().put("device", "23").put("code", "3306").put("delay", "10").put("activate", "1").put("addDepress", "true"));
             }
             //start typing longitude
-            for(char digit:coordinate.longitude().toCharArray()){
-                switch (digit){
+            for (char digit : coordinate.longitude().toCharArray()) {
+                switch (digit) {
                     case '1':
                         commandArray.put(new JSONObject().put("device", "23").put("code", "3302").put("delay", "10").put("activate", "1").put("addDepress", "true"));
                         break;

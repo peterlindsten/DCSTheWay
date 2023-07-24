@@ -41,9 +41,9 @@ public class Ka50 {
         commandArray.put(new JSONObject().put("device", "20").put("code", "3026").put("delay", "0").put("activate", "0.2").put("addDepress", "false"));
         //Press waypoint button
         commandArray.put(new JSONObject().put("device", "20").put("code", "3011").put("delay", "0").put("activate", "1").put("addDepress", "true"));
-        for(int i=1; i<= coords.size(); i++){
+        for (int i = 1; i <= coords.size(); i++) {
             //Press the corresponding waypoint number
-            switch (i){
+            switch (i) {
                 case 1:
                     commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
                     break;
@@ -64,7 +64,7 @@ public class Ka50 {
                     break;
             }
             //Check if latitude is N or S
-            if (coords.get(i-1).latitudeHemisphere() == Hemisphere.NORTH) {
+            if (coords.get(i - 1).latitudeHemisphere() == Hemisphere.NORTH) {
                 //press 0/+ for North
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3001").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -72,8 +72,8 @@ public class Ka50 {
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //Start typing latitude
-            for(char digit:coords.get(i-1).latitude().toCharArray()){
-                switch (digit){
+            for (char digit : coords.get(i - 1).latitude().toCharArray()) {
+                switch (digit) {
                     case '1':
                         commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
                         break;
@@ -107,7 +107,7 @@ public class Ka50 {
                 }
             }
             //Check if longitude is E or W
-            if (coords.get(i-1).longitudeHemisphere() == Hemisphere.EAST) {
+            if (coords.get(i - 1).longitudeHemisphere() == Hemisphere.EAST) {
                 //press 0/+ for East
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3001").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             } else {
@@ -115,8 +115,8 @@ public class Ka50 {
                 commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
             }
             //Start typing longitude
-            for(char digit:coords.get(i-1).longitude().toCharArray()){
-                switch (digit){
+            for (char digit : coords.get(i - 1).longitude().toCharArray()) {
+                switch (digit) {
                     case '1':
                         commandArray.put(new JSONObject().put("device", "20").put("code", "3002").put("delay", "0").put("activate", "1").put("addDepress", "true"));
                         break;

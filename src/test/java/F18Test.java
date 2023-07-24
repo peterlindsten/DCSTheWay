@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class F18Test {
     @Test
-    void shouldReturnF18CoordinateWhenGivenDCSPoint(){
+    void shouldReturnF18CoordinateWhenGivenDCSPoint() {
         //given
         List<Point> dcsPoints = List.of(
                 new Point("42.183494347447", "42.473202920741", "45.021690368652", Hemisphere.NORTH, Hemisphere.EAST),

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class A10Test {
     @Test
-    void shouldReturnA10CoordinateWhenGivenDCSPoint(){
+    void shouldReturnA10CoordinateWhenGivenDCSPoint() {
 //        Point{latitude='42.183497367618', longitude='42.473207155172', elevation='45.021884918213', latitudeHemisphere=NORTH, longitudeHemisphere=EAST}
 //Point{latitude='4211010', longitude='04228392', elevation='148', latitudeHemisphere=NORTH, longitudeHemisphere=EAST}
 

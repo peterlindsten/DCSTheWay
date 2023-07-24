@@ -6,19 +6,18 @@ public class Crosshair {
     private final Window w;
 
     public Crosshair() {
-        this.w=new Window(null){
+        this.w = new Window(null) {
             @Override
-            public void paint(Graphics g)
-            {
+            public void paint(Graphics g) {
                 int width = getWidth();
                 int height = getHeight();
                 g.setColor(Color.MAGENTA);
 
-                g.fillOval(width/2-5, height/2-5, 10, 10);
+                g.fillOval(width / 2 - 5, height / 2 - 5, 10, 10);
             }
+
             @Override
-            public void update(Graphics g)
-            {
+            public void update(Graphics g) {
                 paint(g);
             }
         };
@@ -28,11 +27,11 @@ public class Crosshair {
         w.setBackground(new Color(0, true));
     }
 
-    public void show(){
+    public void show() {
         w.setVisible(true);
     }
 
-    public void hide(){
+    public void hide() {
         w.setVisible(false);
     }
 }

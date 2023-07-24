@@ -13,10 +13,10 @@ public class F18 implements Aircraft {
     public JSONArray getCommands(List<Point> dcsPoints) {
         var coords = getCoords(dcsPoints);
         GUI.warning("""
-                            Please make sure that:\s
-                            1. PRECISE option is boxed in HSI > DATA
-                            2. You are not in the TAC menu
-                            3. You are in the 00°00.0000' coordinate format""");
+                Please make sure that:\s
+                1. PRECISE option is boxed in HSI > DATA
+                2. You are not in the TAC menu
+                3. You are in the 00°00.0000' coordinate format""");
         /*
             AMPCD stuff, device 37
             PB 18 - 3028
@@ -117,7 +117,7 @@ public class F18 implements Aircraft {
     }
 
     private static JSONObject digitCommand(String ufcDevice, char digit) {
-        return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018),"0");
+        return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018), "0");
     }
 
     private static JSONObject deviceCodeDelay(String device, String code, String delay) {

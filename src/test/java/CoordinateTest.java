@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CoordinateTest {
     @Test
-    void shouldConvertDecimalToDMS(){
+    void shouldConvertDecimalToDMS() {
         //given
         BigDecimal decimalCoord = new BigDecimal("42.360123");
 
