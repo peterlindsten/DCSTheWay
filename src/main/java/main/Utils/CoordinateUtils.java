@@ -23,6 +23,14 @@ public class CoordinateUtils {
         int minutes = Integer.parseInt(minutesDecimal.toBigInteger().toString());
         BigDecimal secondsDecimal = minutesDecimal.remainder(BigDecimal.ONE).multiply(new BigDecimal(60));
         int seconds = Integer.parseInt(secondsDecimal.setScale(0, RoundingMode.HALF_UP).toBigInteger().toString());
+        if (seconds == 60) {
+            minutes++;
+            seconds = 0;
+        }
+        if (minutes == 60) {
+            degrees++;
+            minutes = 0;
+        }
         return new DMSCoordinate(degrees, minutes, seconds);
     }
 
@@ -39,15 +47,17 @@ public class CoordinateUtils {
         for (Point dcsPoint : dcsPoints) {
             Double dcsElev = Double.parseDouble(dcsPoint.elevation());
 
-            DMMCoordinate dmsLat = decimalToDMM(new BigDecimal(dcsPoint.latitude()));
-            DMMCoordinate dmsLong = decimalToDMM(new BigDecimal(dcsPoint.longitude()));
+            DMMCoordinate dmmLat = decimalToDMM(new BigDecimal(dcsPoint.latitude()));
+            DMMCoordinate dmmLong = decimalToDMM(new BigDecimal(dcsPoint.longitude()));
 
             DecimalFormat latDegDf = new DecimalFormat("00");
             DecimalFormat latMinDf = new DecimalFormat(mmFormat);
             DecimalFormat longDegDf = new DecimalFormat(longFormat);
             DecimalFormat longMinDf = new DecimalFormat(mmFormat);
-            String lat = latDegDf.format(dmsLat.degrees()) + latMinDf.format(dmsLat.minutes());
-            String lon = longDegDf.format(dmsLong.degrees()) + longMinDf.format(dmsLong.minutes());
+            dmmLat = handleIllegalRoundup(dmmLat, latMinDf);
+            dmmLong = handleIllegalRoundup(dmmLong, longMinDf);
+            String lat = latDegDf.format(dmmLat.degrees()) + latMinDf.format(dmmLat.minutes());
+            String lon = longDegDf.format(dmmLong.degrees()) + longMinDf.format(dmmLong.minutes());
             if (stripDecimalPoint) {
                 lat = lat.replace(".", "");
                 lon = lon.replace(".", "");
@@ -58,5 +68,12 @@ public class CoordinateUtils {
             dmmFtPoints.add(dmmFtPoint);
         }
         return dmmFtPoints;
+    }
+
+    private static DMMCoordinate handleIllegalRoundup(DMMCoordinate dmm, DecimalFormat minutesFormat) {
+        if (minutesFormat.format(dmm.minutes()).split("\\.")[0].equals("60")) {
+            return new DMMCoordinate(dmm.degrees() + 1, 0);
+        }
+        return dmm;
     }
 }
