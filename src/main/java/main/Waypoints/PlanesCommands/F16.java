@@ -34,61 +34,61 @@ public class F16 implements Aircraft {
         JSONArray commandArray = new JSONArray();
 
         //rtn to main page of DED
-        commandArray.put(codeDelayActivate("3032", "20", "-1"));
+        commandArray.put(codeDelayActivate("3032", "30", "-1"));
         //goto STPT page
-        commandArray.put(codeDelayActivate("3006", "0", "1"));
+        commandArray.put(codeDelayActivate("3006", "1", "1"));
         for (Point coordinate : coords) {
             //increment steerpoint
-            commandArray.put(codeDelayActivate("3030", "0", "1"));
+            commandArray.put(codeDelayActivate("3030", "1", "1"));
             //goto lat field
-            commandArray.put(codeDelayActivate("3035", "20", "-1"));
-            commandArray.put(codeDelayActivate("3035", "20", "-1"));
+            commandArray.put(codeDelayActivate("3035", "30", "-1"));
+            commandArray.put(codeDelayActivate("3035", "30", "-1"));
             //check if latitude is N or S
             if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
-                commandArray.put(codeDelayActivate("3004", "0", "1"));
+                commandArray.put(codeDelayActivate("3004", "1", "1"));
             } else {
                 //press S
-                commandArray.put(codeDelayActivate("3010", "0", "1"));
+                commandArray.put(codeDelayActivate("3010", "1", "1"));
             }
             //start typing latitude
             for (char digit : coordinate.latitude().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "0", "1"));
+            commandArray.put(codeDelayActivate("3016", "1", "1"));
             //goto long field
-            commandArray.put(codeDelayActivate("3035", "20", "-1"));
+            commandArray.put(codeDelayActivate("3035", "30", "-1"));
             //check if longitude is E or W
             if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E
-                commandArray.put(codeDelayActivate("3008", "0", "1"));
+                commandArray.put(codeDelayActivate("3008", "1", "1"));
             } else {
                 //press W
-                commandArray.put(codeDelayActivate("3006", "0", "1"));
+                commandArray.put(codeDelayActivate("3006", "1", "1"));
             }
             //start typing longitude
             for (char digit : coordinate.longitude().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "0", "1"));
+            commandArray.put(codeDelayActivate("3016", "1", "1"));
             //goto elevation field
-            commandArray.put(codeDelayActivate("3035", "20", "-1"));
+            commandArray.put(codeDelayActivate("3035", "30", "-1"));
             //start entering elevation
             for (char digit : coordinate.elevation().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "0", "1"));
+            commandArray.put(codeDelayActivate("3016", "1", "1"));
             //goto steerpoint field
-            commandArray.put(codeDelayActivate("3034", "20", "1"));
-            commandArray.put(codeDelayActivate("3034", "20", "1"));
-            commandArray.put(codeDelayActivate("3034", "20", "1"));
-            commandArray.put(codeDelayActivate("3034", "20", "1"));
+            commandArray.put(codeDelayActivate("3034", "30", "1"));
+            commandArray.put(codeDelayActivate("3034", "30", "1"));
+            commandArray.put(codeDelayActivate("3034", "30", "1"));
+            commandArray.put(codeDelayActivate("3034", "30", "1"));
         }
         //return to main page
-        commandArray.put(codeDelayActivate("3032", "20", "-1"));
+        commandArray.put(codeDelayActivate("3032", "30", "-1"));
 
         return commandArray;
     }

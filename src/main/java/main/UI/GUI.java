@@ -90,14 +90,36 @@ public class GUI {
         JButton[] option = {continueButton};
         JOptionPane optionPane = new JOptionPane(text, JOptionPane.WARNING_MESSAGE, JOptionPane.YES_NO_OPTION, null, option, option[0]);
 
+        warnOrErrorDialogSettings(dialog, optionPane);
+    }
+
+    private static void warnOrErrorDialogSettings(JDialog dialog, JOptionPane optionPane) {
+        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        commonDialogSettings(dialog, optionPane);
+    }
+
+    private static void commonDialogSettings(JDialog dialog, JOptionPane optionPane) {
         Point framePoint = frame.getLocation();
         dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
         dialog.setContentPane(optionPane);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         dialog.setResizable(false);
         dialog.setFocusableWindowState(false);
         dialog.pack();
         dialog.setVisible(true);
+    }
+
+    private static void choiceDialogSettings(JDialog dialog, JOptionPane optionPane) {
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        optionPane.addPropertyChangeListener(
+                e -> {
+                    String prop = e.getPropertyName();
+                    if (dialog.isVisible()
+                            && (e.getSource() == optionPane)
+                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                        dialog.setVisible(false);
+                    }
+                });
+        commonDialogSettings(dialog, optionPane);
     }
 
     public static void error(String text) {
@@ -106,67 +128,26 @@ public class GUI {
         continueButton.addActionListener(e -> dialog.dispose());
         JButton[] option = {continueButton};
         JOptionPane optionPane = new JOptionPane(text, JOptionPane.ERROR_MESSAGE, JOptionPane.YES_NO_OPTION, null, option, option[0]);
-        Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
-        dialog.setContentPane(optionPane);
-        dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-        dialog.setResizable(false);
-        dialog.setFocusableWindowState(false);
-        dialog.pack();
-        dialog.setVisible(true);
+        warnOrErrorDialogSettings(dialog, optionPane);
     }
 
     public static String choice(String question, String option1, String option2) {
         JDialog dialog = new JDialog(frame, "Choose an option", true);
         Object[] options = {option1, option2};
+        return performChoiceDialog(question, dialog, options);
+    }
+
+    private static String performChoiceDialog(String question, JDialog dialog, Object[] options) {
         JOptionPane optionPane = new JOptionPane(question, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, options, options[0]);
 
-        Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
-        dialog.setContentPane(optionPane);
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        dialog.setResizable(false);
-        dialog.setFocusableWindowState(false);
-
-        optionPane.addPropertyChangeListener(
-                e -> {
-                    String prop = e.getPropertyName();
-                    if (dialog.isVisible()
-                            && (e.getSource() == optionPane)
-                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-                        dialog.setVisible(false);
-                    }
-                });
-
-        dialog.pack();
-        dialog.setVisible(true);
+        choiceDialogSettings(dialog, optionPane);
         return (String) optionPane.getValue();
     }
 
+
     public static String multiChoice(String question, String[] choices) {
         JDialog dialog = new JDialog(frame, "Choose an option", true);
-        JOptionPane optionPane = new JOptionPane(question, JOptionPane.QUESTION_MESSAGE, JOptionPane.YES_NO_OPTION, null, choices, choices[0]);
-
-        Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
-        dialog.setContentPane(optionPane);
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        dialog.setResizable(false);
-        dialog.setFocusableWindowState(false);
-
-        optionPane.addPropertyChangeListener(
-                e -> {
-                    String prop = e.getPropertyName();
-                    if (dialog.isVisible()
-                            && (e.getSource() == optionPane)
-                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-                        dialog.setVisible(false);
-                    }
-                });
-
-        dialog.pack();
-        dialog.setVisible(true);
-        return (String) optionPane.getValue();
+        return performChoiceDialog(question, dialog, choices);
     }
 
     public static F15EOptions f15eDialog() {
@@ -190,24 +171,7 @@ public class GUI {
         dialogPanel.add(optionPane);
         dialogPanel.add(dialogTable);
 
-        Point framePoint = frame.getLocation();
-        dialog.setLocation((int) framePoint.getX() + frame.getWidth(), (int) framePoint.getY());
-        dialog.setContentPane(dialogPanel);
-        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        dialog.setResizable(false);
-        dialog.setFocusableWindowState(false);
-        optionPane.addPropertyChangeListener(
-                e -> {
-                    String prop = e.getPropertyName();
-                    if (dialog.isVisible()
-                            && (e.getSource() == optionPane)
-                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-                        dialog.setVisible(false);
-                    }
-                });
-
-        dialog.pack();
-        dialog.setVisible(true);
+        choiceDialogSettings(dialog, optionPane);
 
         return new F15EOptions("Pilot".equals(optionPane.getValue()),
                 (String) seriesBox.getSelectedObjects()[0],
@@ -226,6 +190,7 @@ public class GUI {
         crosshair.show();
         beginSelectionButton.setEnabled(false);
         selectPointButton.setEnabled(true);
+        clearPointsButton.setEnabled(true);
     }
 
     private static void populatedSelectionState() {

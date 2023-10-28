@@ -5,14 +5,12 @@ import main.models.Point;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CoordinateTest {
-    private static final List<Point> p = Arrays.asList(new Point("33.999999", "33.1234", "54.123", Hemisphere.NORTH, Hemisphere.EAST));
+    private static final List<Point> p = List.of(new Point("33.999999", "33.1234", "54.123", Hemisphere.NORTH, Hemisphere.EAST));
 
     @Test
     void shouldConvertDecimalToDMS() {

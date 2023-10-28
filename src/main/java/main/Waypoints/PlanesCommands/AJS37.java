@@ -42,31 +42,31 @@ public class AJS37 implements Aircraft {
          */
         JSONArray commandArray = new JSONArray();
         // REF/LOLA
-        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "1", "0.5", "false"));
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "0.5", "false"));
         // IN
-        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "1", "false"));
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "false"));
         // Start entry
         for (int i = 0; i < coords.size() && i < (9 - offset); i++) {
             for (char digit : coords.get(i).longitude().toCharArray()) {
                 // Digits
-                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
+                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "true"));
             }
             for (char digit : coords.get(i).latitude().toCharArray()) {
                 // Digits
-                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "1", "true"));
+                commandArray.put(deviceCodeDelayActivateDepress("12", "302" + digit, "1", "true"));
             }
             // B1-B9
-            commandArray.put(deviceCodeDelayActivateDepress("12", "301" + (i + 1 + offset), "1", "1", "true"));
+            commandArray.put(deviceCodeDelayActivateDepress("12", "301" + (i + 1 + offset), "1", "true"));
         }
         // AKT/POS
-        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "1", "0.6", "false"));
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3009", "0.6", "false"));
         // OUT
-        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "1", "0", "false"));
+        commandArray.put(deviceCodeDelayActivateDepress("23", "3008", "0", "false"));
         return commandArray;
     }
 
-    private static JSONObject deviceCodeDelayActivateDepress(String device, String code, String delay, String activate, String depress) {
-        return new JSONObject().put("device", device).put("code", code).put("delay", delay).put("activate", activate).put("addDepress", depress);
+    private static JSONObject deviceCodeDelayActivateDepress(String device, String code, String activate, String depress) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", "1").put("activate", activate).put("addDepress", depress);
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {
