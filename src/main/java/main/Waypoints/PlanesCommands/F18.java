@@ -10,6 +10,11 @@ import org.json.JSONObject;
 import java.util.List;
 
 public class F18 implements Aircraft {
+    static String instant = "10";
+    String small = "10";
+    String twenty = "20";
+    static String thirty = "80";
+    String forty = "40";
     public JSONArray getCommands(List<Point> dcsPoints) {
         var coords = getCoords(dcsPoints);
         GUI.warning("""
@@ -49,54 +54,54 @@ public class F18 implements Aircraft {
         JSONArray commandArray = new JSONArray();
 
         //enter the SUPT menu
-        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", "0"));
-        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", "0"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", instant));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3028", instant));
         //select HSD
-        commandArray.put(deviceCodeDelay(ampcdDevice, "3012", "0"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3012", instant));
         //select DATA
-        commandArray.put(deviceCodeDelay(ampcdDevice, "3020", "0"));
+        commandArray.put(deviceCodeDelay(ampcdDevice, "3020", instant));
 
         for (Point coordinate : coords) {
             //increment steerpoint
-            commandArray.put(deviceCodeDelay(ampcdDevice, "3022", "20"));
+            commandArray.put(deviceCodeDelay(ampcdDevice, "3022", twenty));
             //press UFC
-            commandArray.put(deviceCodeDelay(ampcdDevice, "3015", "40"));
+            commandArray.put(deviceCodeDelay(ampcdDevice, "3015", forty));
             // press position 1
-            commandArray.put(deviceCodeDelay(ufcDevice, "3010", "10"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3010", small));
             //check if latitude is N or S
             if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N north
-                commandArray.put(deviceCodeDelay(ufcDevice, "3020", "0"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3020", twenty));
             } else {
                 //press S south
-                commandArray.put(deviceCodeDelay(ufcDevice, "3026", "0"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3026", twenty));
             }
             // Enter lat
             enterLatOrLongDigits(commandArray, ufcDevice, coordinate.latitude());
             //press enter
-            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", thirty));
             //check if longitude is E or W
             if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E east
-                commandArray.put(deviceCodeDelay(ufcDevice, "3024", "0"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3024", twenty));
             } else {
                 //press W west
-                commandArray.put(deviceCodeDelay(ufcDevice, "3022", "0"));
+                commandArray.put(deviceCodeDelay(ufcDevice, "3022", twenty));
             }
             // Enter long
             enterLatOrLongDigits(commandArray, ufcDevice, coordinate.longitude());
             //press enter
-            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", thirty));
             // press position 3 to select elevation
-            commandArray.put(deviceCodeDelay(ufcDevice, "3012", "10"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3012", small));
             // press position 1 to select ft
-            commandArray.put(deviceCodeDelay(ufcDevice, "3010", "10"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3010", small));
             //start entering elevation
             for (char digit : coordinate.elevation().toCharArray()) {
                 commandArray.put(digitCommand(ufcDevice, digit));
             }
             //press enter
-            commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
+            commandArray.put(deviceCodeDelay(ufcDevice, "3029", thirty));
         }
 
         return commandArray;
@@ -109,7 +114,7 @@ public class F18 implements Aircraft {
             commandArray.put(digitCommand(ufcDevice, digit));
         }
         //press enter
-        commandArray.put(deviceCodeDelay(ufcDevice, "3029", "30"));
+        commandArray.put(deviceCodeDelay(ufcDevice, "3029", thirty));
         //start entering last 4 digits
         for (char digit : minuteDecimals.toCharArray()) {
             commandArray.put(digitCommand(ufcDevice, digit));
@@ -117,7 +122,7 @@ public class F18 implements Aircraft {
     }
 
     private static JSONObject digitCommand(String ufcDevice, char digit) {
-        return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018), "0");
+        return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018), instant);
     }
 
     private static JSONObject deviceCodeDelay(String device, String code, String delay) {
