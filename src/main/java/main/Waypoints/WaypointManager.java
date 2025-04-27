@@ -45,6 +45,7 @@ public class WaypointManager {
                 case "AJS37" -> a = new AJS37();
                 case "F-15ESE" -> a = new F15E();
                 case "CH-47Fbl1" -> a = new CH47F();
+                case "OH58D" -> a = new OH58D();
                 default -> GUI.error("You are not flying a supported module.");
             }
             if (null != a) {
