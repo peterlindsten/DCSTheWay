@@ -8,45 +8,34 @@ import main.models.Hemisphere;
 import main.models.Point;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class WaypointManager {
     static private final ArrayList<Point> waypoints = new ArrayList<>();
 
-    public static void transfer() {
+    public static void transfer(int speed) {
         String model = PortListenerThread.getPlaneModel();
 
         if (model != null && !waypoints.isEmpty()) {
             Aircraft a = null;
             switch (model) {
-                case "F-16C_50" -> a = new F16();
-                case "FA-18C_hornet" -> a = new F18();
-                case "A-10C_2", "A-10C" -> a = new A10CII();
-                case "M-2000C" -> {
-                    List<Point> m2000Coords = M2000.getCoords(waypoints);
-                    String dataToSend = M2000.getCommands(m2000Coords).toString();
-                    PortSender.send(dataToSend);
-                }
-                case "AV8BNA" -> {
-                    List<Point> av8bnaCoords = AV8BNA.getCoords(waypoints);
-                    String dataToSend = AV8BNA.getCommands(av8bnaCoords).toString();
-                    PortSender.send(dataToSend);
-                }
+                case "F-16C_50" -> a = new F16(speed);
+                case "FA-18C_hornet" -> a = new F18(speed);
+                case "A-10C_2", "A-10C" -> a = new A10CII(speed);
+                case "M-2000C" -> a = new M2000(speed);
+                case "AV8BNA" -> a = new AV8BNA(speed);
                 case "Ka-50" -> {
                     if (waypoints.size() > 6) {
                         GUI.error("The Ka-50 can store a maximum of 6 waypoints. ");
                     } else {
-                        List<Point> Ka50Coords = Ka50.getCoords(waypoints);
-                        String dataToSend = Ka50.getCommands(Ka50Coords).toString();
-                        PortSender.send(dataToSend);
+                        a = new Ka50(speed);
                     }
                 }
-                case "AH-64D_BLK_II" -> a = new AH64();
-                case "AJS37" -> a = new AJS37();
-                case "F-15ESE" -> a = new F15E();
-                case "CH-47Fbl1" -> a = new CH47F();
-                case "OH58D" -> a = new OH58D();
-                default -> GUI.error("You are not flying a supported module.");
+                case "AH-64D_BLK_II" -> a = new AH64(speed);
+                case "AJS37" -> a = new AJS37(speed);
+                case "F-15ESE" -> a = new F15E(speed);
+                case "CH-47Fbl1" -> a = new CH47F(speed);
+                case "OH58D" -> a = new OH58D(speed);
+                default -> GUI.error("Unsupported module: " + model);
             }
             if (null != a) {
                 PortSender.send(a.getCommands(waypoints).toString());

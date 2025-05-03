@@ -8,7 +8,11 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class F16 implements Aircraft {
+public class F16 extends Aircraft {
+    public F16(int speed) {
+        super(speed);
+    }
+
     public JSONArray getCommands(List<Point> dcsPoints) {
         List<Point> coords = getCoords(dcsPoints);
         /*
@@ -34,71 +38,71 @@ public class F16 implements Aircraft {
         JSONArray commandArray = new JSONArray();
 
         //rtn to main page of DED
-        commandArray.put(codeDelayActivate("3032", "30", "-1"));
+        commandArray.put(codeDelayActivate("3032", 30, "-1"));
         //goto STPT page
-        commandArray.put(codeDelayActivate("3006", "1", "1"));
+        commandArray.put(codeDelayActivate("3006", 1, "1"));
         for (Point coordinate : coords) {
             //increment steerpoint
-            commandArray.put(codeDelayActivate("3030", "1", "1"));
+            commandArray.put(codeDelayActivate("3030", 1, "1"));
             //goto lat field
-            commandArray.put(codeDelayActivate("3035", "30", "-1"));
-            commandArray.put(codeDelayActivate("3035", "30", "-1"));
+            commandArray.put(codeDelayActivate("3035", 30, "-1"));
+            commandArray.put(codeDelayActivate("3035", 30, "-1"));
             //check if latitude is N or S
             if (coordinate.latitudeHemisphere() == Hemisphere.NORTH) {
                 //press N
-                commandArray.put(codeDelayActivate("3004", "1", "1"));
+                commandArray.put(codeDelayActivate("3004", 1, "1"));
             } else {
                 //press S
-                commandArray.put(codeDelayActivate("3010", "1", "1"));
+                commandArray.put(codeDelayActivate("3010", 1, "1"));
             }
             //start typing latitude
             for (char digit : coordinate.latitude().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "1", "1"));
+            commandArray.put(codeDelayActivate("3016", 1, "1"));
             //goto long field
-            commandArray.put(codeDelayActivate("3035", "30", "-1"));
+            commandArray.put(codeDelayActivate("3035", 30, "-1"));
             //check if longitude is E or W
             if (coordinate.longitudeHemisphere() == Hemisphere.EAST) {
                 //press E
-                commandArray.put(codeDelayActivate("3008", "1", "1"));
+                commandArray.put(codeDelayActivate("3008", 1, "1"));
             } else {
                 //press W
-                commandArray.put(codeDelayActivate("3006", "1", "1"));
+                commandArray.put(codeDelayActivate("3006", 1, "1"));
             }
             //start typing longitude
             for (char digit : coordinate.longitude().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "1", "1"));
+            commandArray.put(codeDelayActivate("3016", 1, "1"));
             //goto elevation field
-            commandArray.put(codeDelayActivate("3035", "30", "-1"));
+            commandArray.put(codeDelayActivate("3035", 30, "-1"));
             //start entering elevation
             for (char digit : coordinate.elevation().toCharArray()) {
                 enterDigit(commandArray, digit);
             }
             //press enter
-            commandArray.put(codeDelayActivate("3016", "1", "1"));
+            commandArray.put(codeDelayActivate("3016", 1, "1"));
             //goto steerpoint field
-            commandArray.put(codeDelayActivate("3034", "30", "1"));
-            commandArray.put(codeDelayActivate("3034", "30", "1"));
-            commandArray.put(codeDelayActivate("3034", "30", "1"));
-            commandArray.put(codeDelayActivate("3034", "30", "1"));
+            commandArray.put(codeDelayActivate("3034", 30, "1"));
+            commandArray.put(codeDelayActivate("3034", 30, "1"));
+            commandArray.put(codeDelayActivate("3034", 30, "1"));
+            commandArray.put(codeDelayActivate("3034", 30, "1"));
         }
         //return to main page
-        commandArray.put(codeDelayActivate("3032", "30", "-1"));
+        commandArray.put(codeDelayActivate("3032", 30, "-1"));
 
         return commandArray;
     }
 
-    private static void enterDigit(JSONArray commandArray, char digit) {
-        commandArray.put(codeDelayActivate(Integer.toString(Character.getNumericValue(digit) + 3002), "0", "1"));
+    private void enterDigit(JSONArray commandArray, char digit) {
+        commandArray.put(codeDelayActivate(Integer.toString(Character.getNumericValue(digit) + 3002), 0, "1"));
     }
 
-    private static JSONObject codeDelayActivate(String code, String delay, String activate) {
-        return new JSONObject().put("device", "17").put("code", code).put("delay", delay).put("activate", activate).put("addDepress", "true");
+    private JSONObject codeDelayActivate(String code, int delay, String activate) {
+        return new JSONObject().put("device", "17").put("code", code).put("delay", getCorrectedDelay(delay)).put("activate", activate).put("addDepress", "true");
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {

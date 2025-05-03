@@ -9,21 +9,25 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class F15E implements Aircraft {
+public class F15E extends Aircraft {
 
     private static final String[] tenKeys = new String[]{
-            "3036", // 0
-            "3020", // 1/A
-            "3021", // 2/N
-            "3022", // 3/B
-            "3025", // 4/W
-            "3026", // 5/M
-            "3027", // 6/E
-            "3030", // 7/:
-            "3031", // 8/S
-            "3032", // 9/C
+        "3036", // 0
+        "3020", // 1/A
+        "3021", // 2/N
+        "3022", // 3/B
+        "3025", // 4/W
+        "3026", // 5/M
+        "3027", // 6/E
+        "3030", // 7/:
+        "3031", // 8/S
+        "3032", // 9/C
     };
     private static final String SHIFT = "3033";
+
+    public F15E(int speed) {
+        super(speed);
+    }
 
     @Override
     public JSONArray getCommands(List<Point> dcsPoints) {
@@ -104,14 +108,14 @@ public class F15E implements Aircraft {
         return commandArray;
     }
 
-    private static void enterDigits(String coords, JSONArray commandArray, String device) {
+    private void enterDigits(String coords, JSONArray commandArray, String device) {
         for (char digit : coords.toCharArray()) {
             commandArray.put(deviceCodeDelay(device, tenKeys[Character.getNumericValue(digit)]));
         }
     }
 
-    private static JSONObject deviceCodeDelay(String device, String code) {
-        return new JSONObject().put("device", device).put("code", code).put("delay", "5").put("activate", "1").put("addDepress", "true");
+    private JSONObject deviceCodeDelay(String device, String code) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", getCorrectedDelay(5)).put("activate", "1").put("addDepress", "true");
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {

@@ -8,19 +8,24 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class CH47F implements Aircraft {
+public class CH47F extends Aircraft {
     private static final String[] tenKeys = new String[]{
-            "3010", // 0
-            "3011", // 1
-            "3012", // 2
-            "3013", // 3
-            "3014", // 4
-            "3015", // 5
-            "3016", // 6
-            "3017", // 7
-            "3018", // 8
-            "3019", // 9
+        "3010", // 0
+        "3011", // 1
+        "3012", // 2
+        "3013", // 3
+        "3014", // 4
+        "3015", // 5
+        "3016", // 6
+        "3017", // 7
+        "3018", // 8
+        "3019", // 9
     };
+
+    public CH47F(int speed) {
+        super(speed);
+    }
+
     @Override
     public JSONArray getCommands(List<Point> dcsPoints) {
         List<Point> coords = CH47F.getCoords(dcsPoints);
@@ -50,7 +55,7 @@ public class CH47F implements Aircraft {
         commandArray.put(deviceCodeDelay("3008")); // CLR
         // We loop backwards, since we push coords onto the front of the flightplan
         // this makes the order you selected the coords in match the order in the flightplan
-        for (int i = coords.size()-1; i >= 0; i--) {
+        for (int i = coords.size() - 1; i >= 0; i--) {
             // Lat
             if (coords.get(i).latitudeHemisphere() == Hemisphere.NORTH) {
                 commandArray.put(deviceCodeDelay("3036"));
@@ -73,7 +78,7 @@ public class CH47F implements Aircraft {
         return commandArray;
     }
 
-    private static void enterDigits(String coords, JSONArray commandArray) {
+    private void enterDigits(String coords, JSONArray commandArray) {
         for (char digit : coords.toCharArray()) {
             if (digit == '.') {
                 commandArray.put(deviceCodeDelay("3020"));
@@ -83,8 +88,8 @@ public class CH47F implements Aircraft {
         }
     }
 
-    private static JSONObject deviceCodeDelay(String code) {
-        return new JSONObject().put("device", "3").put("code", code).put("delay", "5").put("activate", "1").put("addDepress", "true");
+    private JSONObject deviceCodeDelay(String code) {
+        return new JSONObject().put("device", "3").put("code", code).put("delay", getCorrectedDelay(5)).put("activate", "1").put("addDepress", "true");
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {

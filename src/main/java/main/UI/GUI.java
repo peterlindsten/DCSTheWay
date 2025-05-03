@@ -11,6 +11,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 public class GUI {
     static private JFrame frame;
@@ -20,6 +21,8 @@ public class GUI {
     static private JButton selectPointButton;
     static private JButton transferToDCSButton;
     static private JButton clearPointsButton;
+    static private JPanel speedPanel;
+    static private JSpinner speedSpinner;
     static private JTextArea debug;
 
 
@@ -33,12 +36,18 @@ public class GUI {
         transferToDCSButton = new JButton("Begin transfer to DCS");
         selectPointButton = new JButton("Select point");
         clearPointsButton = new JButton("Discard points");
-        debug = new JTextArea(3, 10);
+        speedPanel = new JPanel(new GridLayout(0, 2, 5, 0));
+        speedSpinner = new JSpinner();
+        speedSpinner.setModel(new SpinnerListModel(Arrays.asList(1, 5, 10, 15, 20, 25, 50, 75, 100, 150, 200, 300, 400, 500)));
+        speedSpinner.setValue(100);
+        speedPanel.add(new JLabel("Speed %"));
+        speedPanel.add(speedSpinner);
+        debug = new JTextArea(4, 10);
 
 
         beginSelectionButton.addActionListener(e -> emptySelectionState());
         transferToDCSButton.addActionListener(e -> {
-            WaypointManager.transfer();
+            WaypointManager.transfer((int) speedSpinner.getValue());
             transferredState();
         });
 
@@ -47,8 +56,9 @@ public class GUI {
                 refreshWaypointCount();
                 populatedSelectionState();
                 debug.setText("Lat: " + CoordinateUtils.decimalToDMS(new BigDecimal(PortListenerThread.getLatitude())) +
-                        "\nLong: " + CoordinateUtils.decimalToDMS(new BigDecimal(PortListenerThread.getLongitude())) +
-                        "\nElev: " + PortListenerThread.getElevation());
+                    "\nLong: " + CoordinateUtils.decimalToDMS(new BigDecimal(PortListenerThread.getLongitude())) +
+                    "\nElev: " + PortListenerThread.getElevation() +
+                    "\nPlane: " + PortListenerThread.getPlaneModel());
                 debug.updateUI();
             } else {
                 error("No connection to DCS detected.");
@@ -67,6 +77,7 @@ public class GUI {
         gui.add(selectPointButton);
         gui.add(clearPointsButton);
         gui.add(transferToDCSButton);
+        gui.add(speedPanel);
         //gui.add(debug);
 
         standbyState();
@@ -111,14 +122,14 @@ public class GUI {
     private static void choiceDialogSettings(JDialog dialog, JOptionPane optionPane) {
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
         optionPane.addPropertyChangeListener(
-                e -> {
-                    String prop = e.getPropertyName();
-                    if (dialog.isVisible()
-                            && (e.getSource() == optionPane)
-                            && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
-                        dialog.setVisible(false);
-                    }
-                });
+            e -> {
+                String prop = e.getPropertyName();
+                if (dialog.isVisible()
+                    && (e.getSource() == optionPane)
+                    && (prop.equals(JOptionPane.VALUE_PROPERTY))) {
+                    dialog.setVisible(false);
+                }
+            });
         commonDialogSettings(dialog, optionPane);
     }
 
@@ -174,8 +185,8 @@ public class GUI {
         choiceDialogSettings(dialog, optionPane);
 
         return new F15EOptions("Pilot".equals(optionPane.getValue()),
-                (String) seriesBox.getSelectedObjects()[0],
-                Integer.parseInt((String) firstBox.getEditor().getItem()));
+            (String) seriesBox.getSelectedObjects()[0],
+            Integer.parseInt((String) firstBox.getEditor().getItem()));
     }
 
     private static void standbyState() {
@@ -221,7 +232,7 @@ public class GUI {
     private static void loadIcon() {
         try {
             try (InputStream in = GUI.class.getClassLoader()
-                    .getResourceAsStream("TheWayIcon40.png")) {
+                .getResourceAsStream("TheWayIcon40.png")) {
                 if (in != null) {
                     byte[] bytes = in.readAllBytes();
                     ImageIcon icon = new ImageIcon(bytes);

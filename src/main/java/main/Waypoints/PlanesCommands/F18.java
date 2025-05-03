@@ -9,19 +9,24 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class F18 implements Aircraft {
-    static String instant = "10";
-    String small = "10";
-    String twenty = "20";
-    static String thirty = "80";
-    String forty = "40";
+public class F18 extends Aircraft {
+    static int instant = 10;
+    int small = 10;
+    int twenty = 20;
+    static int thirty = 80;
+    int forty = 40;
+
+    public F18(int speed) {
+        super(speed);
+    }
+
     public JSONArray getCommands(List<Point> dcsPoints) {
         var coords = getCoords(dcsPoints);
         GUI.warning("""
-                Please make sure that:\s
-                1. PRECISE option is boxed in HSI > DATA
-                2. You are not in the TAC menu
-                3. You are in the 00°00.0000' coordinate format""");
+            Please make sure that:\s
+            1. PRECISE option is boxed in HSI > DATA
+            2. You are not in the TAC menu
+            3. You are in the 00°00.0000' coordinate format""");
         /*
             AMPCD stuff, device 37
             PB 18 - 3028
@@ -107,7 +112,7 @@ public class F18 implements Aircraft {
         return commandArray;
     }
 
-    private static void enterLatOrLongDigits(JSONArray commandArray, String ufcDevice, String latOrLong) {
+    private void enterLatOrLongDigits(JSONArray commandArray, String ufcDevice, String latOrLong) {
         String degreesMinutes = latOrLong.substring(0, latOrLong.length() - 4);
         String minuteDecimals = latOrLong.substring(latOrLong.length() - 4);
         for (char digit : degreesMinutes.toCharArray()) {
@@ -121,12 +126,12 @@ public class F18 implements Aircraft {
         }
     }
 
-    private static JSONObject digitCommand(String ufcDevice, char digit) {
+    private JSONObject digitCommand(String ufcDevice, char digit) {
         return deviceCodeDelay(ufcDevice, Integer.toString(Character.getNumericValue(digit) + 3018), instant);
     }
 
-    private static JSONObject deviceCodeDelay(String device, String code, String delay) {
-        return new JSONObject().put("device", device).put("code", code).put("delay", delay).put("activate", "1").put("addDepress", "true");
+    private JSONObject deviceCodeDelay(String device, String code, int delay) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", getCorrectedDelay(delay)).put("activate", "1").put("addDepress", "true");
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {

@@ -8,7 +8,11 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-public class A10CII implements Aircraft {
+public class A10CII extends Aircraft {
+    public A10CII(int speed) {
+        super(speed);
+    }
+
     @Override
     public JSONArray getCommands(List<Point> dcsPoints) {
         var coords = getCoords(dcsPoints);
@@ -46,7 +50,7 @@ public class A10CII implements Aircraft {
 
 
         //go to WP page
-        commandArray.put(codeDelay("3011", "10"));
+        commandArray.put(codeDelay("3011", 10));
         //goto WAYPOINT page
         commandArray.put(code("3005"));
         for (Point coordinate : coords) {
@@ -85,16 +89,16 @@ public class A10CII implements Aircraft {
         return commandArray;
     }
 
-    private static JSONObject digitCommand(char digit) {
+    private JSONObject digitCommand(char digit) {
         return digit == '0' ? code("3024") : code(Integer.toString(Character.getNumericValue(digit) + 3014));
     }
 
-    private static JSONObject code(String code) {
-        return codeDelay(code, "0");
+    private JSONObject code(String code) {
+        return codeDelay(code, 0);
     }
 
-    private static JSONObject codeDelay(String code, String delay) {
-        return new JSONObject().put("device", "9").put("code", code).put("delay", delay).put("activate", "1").put("addDepress", "true");
+    private JSONObject codeDelay(String code, int delay) {
+        return new JSONObject().put("device", "9").put("code", code).put("delay", getCorrectedDelay(delay)).put("activate", "1").put("addDepress", "true");
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {

@@ -13,7 +13,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AJS37 implements Aircraft {
+public class AJS37 extends Aircraft {
+    public AJS37(int speed) {
+        super(speed);
+    }
+
     @Override
     public JSONArray getCommands(List<Point> dcsPoints) {
         var coords = getCoords(dcsPoints);
@@ -65,8 +69,8 @@ public class AJS37 implements Aircraft {
         return commandArray;
     }
 
-    private static JSONObject deviceCodeDelayActivateDepress(String device, String code, String activate, String depress) {
-        return new JSONObject().put("device", device).put("code", code).put("delay", "1").put("activate", activate).put("addDepress", depress);
+    private JSONObject deviceCodeDelayActivateDepress(String device, String code, String activate, String depress) {
+        return new JSONObject().put("device", device).put("code", code).put("delay", getCorrectedDelay(1)).put("activate", activate).put("addDepress", depress);
     }
 
     public static List<Point> getCoords(List<Point> dcsPoints) {
@@ -97,6 +101,6 @@ public class AJS37 implements Aircraft {
 
     public static int getArgs() {
         return Integer.parseInt(GUI.multiChoice("First in sequence?",
-                new String[]{"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"}).substring(1)) - 1;
+            new String[]{"B1", "B2", "B3", "B4", "B5", "B6", "B7", "B8", "B9"}).substring(1)) - 1;
     }
 }
