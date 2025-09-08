@@ -28,6 +28,11 @@ Supported modules:
 * Ka-50 Blackshark
 * AH-64D Apache
 * AJS37
+* F-15E
+* CH-47F
+* OH-58D
+* F-14
+* JF-17
 
 Multiplayer is supported as long as the server has ownship/player exports turned on.
 
