@@ -35,7 +35,8 @@ public class WaypointManager {
                 case "F-15ESE" -> a = new F15E(speed);
                 case "CH-47Fbl1" -> a = new CH47F(speed);
                 case "OH58D" -> a = new OH58D(speed);
-                case "F-14B", "F-14A-135-GR" -> a = new F14(speed);
+                case "F-14A-95-GR", "F-14A-135-GR-Early", "F-14A-135-GR", "F-14B" -> a = new F14(speed);
+                case "F-14BU" -> a = new F14BU(speed);
                 case "JF-17" -> a = new JF17(speed);
                 default -> GUI.error("Unsupported module: " + model);
             }
